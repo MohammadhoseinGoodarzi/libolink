@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Libolink
+
+> A social platform for book lovers — discover, share, and connect over books.
+
+![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
+![React](https://img.shields.io/badge/React-19-61dafb?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8?logo=tailwindcss)
+
+## Overview
+
+Libolink is a book-centric social network where readers discover new reads, share reviews, exchange books, and connect with others who share their literary tastes.
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router, RSC-first) |
+| Language | TypeScript 5 (strict) |
+| Styling | Tailwind CSS v4 + shadcn/ui (new-york) |
+| UI Primitives | Radix UI |
+| Icons | Lucide React |
+| Server State | React Server Components + `async/await` |
+| Client State | TanStack Query v5 |
+| Package Manager | pnpm |
 
 ## Getting Started
 
-First, run the development server:
+**Prerequisites:** Node.js 18+, pnpm
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Install dependencies
+pnpm install
+
+# Start dev server
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/                  # Next.js App Router — pages and layouts (RSC by default)
+components/
+  landing/            # Landing page sections (Header, Hero, …)
+  ui/                 # shadcn/ui primitives customized to Libolink design system
+lib/                  # Business logic, data helpers, utilities
+hooks/                # Custom React hooks
+public/               # Static assets
+```
 
-## Learn More
+> Path alias `@/` maps to the project root.
 
-To learn more about Next.js, take a look at the following resources:
+## Design System
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Brand tokens are defined in [`app/globals.css`](app/globals.css) under `@theme inline`:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Token | Value | Usage |
+|---|---|---|
+| `brand-primary` | `#023618` | Main green — buttons, headings |
+| `brand-accent` | `#c14953` | Destructive / CTA accent |
+| `brand-navy` | `#1d3557` | Dark navy for contrast |
+| `brand-surface` | `#E8EBF4` | Subtle background fills |
+| `brand-gray` | `#6B7280` | Secondary text |
+| `brand-soft` | `#F8EAED` | Soft pink tint |
+| `brand-glow` | `#E9D5FF` | Purple glow for shadows |
 
-## Deploy on Vercel
+### Button Variants
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Variant | Description |
+|---|---|
+| `default` | Primary dark-green filled button |
+| `outline` | Surface-background with green text |
+| `ghost` | Transparent with green text |
+| `destructive` | Red accent, large — for bold CTAs |
+| `post` | Primary with purple glow shadow — for post actions |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Commands
+
+```bash
+pnpm dev        # Start development server
+pnpm build      # Production build
+pnpm start      # Start production server
+pnpm lint       # Run ESLint
+```
+
+## Key Conventions
+
+- **Server Components by default** — only add `"use client"` when strictly needed (state, browser APIs, event handlers)
+- **No hardcoded hex values** — always use or create a CSS token in `globals.css`
+- **Tailwind built-in scale** — prefer `max-w-120` over `max-w-[480px]`; arbitrary values only when no built-in equivalent exists
+- **shadcn/ui components** are installed via `pnpm dlx shadcn@latest add <component>` then edited directly — no duplicate overrides
+- **Data fetching** in Server Components via `async/await`; TanStack Query only for mutations, polling, and optimistic updates
