@@ -1,0 +1,14 @@
+{
+  "Header": {
+    "signUp": "Sign up",
+    "signIn": "Sign in",
+    "logoAlt": "Libolink"
+  },
+  "Hero": {
+    "title": "Welcome To book Country",
+    "subtitle": "If the world of books were a nation, readers would be its citizens and LEXO would be its capital.",
+    "getStart": "Get Start",
+    "readMore": "Read More",
+    "appPreviewAlt": "Libolink app preview"
+  }
+}
