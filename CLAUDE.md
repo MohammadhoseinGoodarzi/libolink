@@ -101,6 +101,40 @@ pnpm dlx shadcn@latest add <component>  # Add shadcn component
 - **Do NOT use `useQuery` to replace RSC data fetching** — server data belongs in `async` Server Components
 - DevTools (`ReactQueryDevtools`) are bundled in the provider and visible in development only
 
+## Internationalization (i18n) — Zero-Package Preparation
+
+The app is **not** multi-language yet, but is wired for a zero-friction next-intl migration.
+
+### Current setup (no packages installed)
+- **`messages/en.json`** — single source of truth for all UI strings. Use nested namespaces named after the component (e.g. `"Header"`, `"Hero"`). Never hardcode display strings in components.
+- **`lib/dictionary.ts`** — async helper that wraps `messages/en.json`. Its API intentionally mirrors `next-intl`'s `getTranslations()`:
+  ```ts
+  const t = await getDictionary("Header");
+  t("signIn"); // → "Sign in"
+  ```
+- **All Server Components that render text must be `async`** and call `getDictionary(namespace)` instead of writing strings inline.
+
+### Rules
+- **Never hardcode UI strings in components.** Every user-visible string goes in `messages/en.json` first, then referenced via `getDictionary`.
+- When adding a new component with text, add its namespace to `messages/en.json` and call `getDictionary` in the component.
+- **Namespace = component name** (PascalCase, matching the component filename). Key names are camelCase.
+
+### Migration path (when next-intl is added)
+Replace the entire body of `lib/dictionary.ts` with one line:
+```ts
+export { getTranslations as getDictionary } from "next-intl/server";
+```
+Everything else stays the same — no component changes needed.
+
+### Adding a new language
+1. Install `next-intl`: `pnpm add next-intl`
+2. Copy `messages/en.json` → `messages/[locale].json` and translate
+3. Replace `lib/dictionary.ts` body as above
+4. Add next-intl middleware and routing config
+
+## Tailwind Scale Rule
+- **Always use Tailwind's built-in scale.** Write `max-w-120`, not `max-w-[480px]`. Use bracket (arbitrary) values only when no built-in equivalent exists.
+
 ## Key Reminders
 - This is a monorepo-free single Next.js app
 - `components/ui/` files are intentionally edited — changes there are part of the design system
