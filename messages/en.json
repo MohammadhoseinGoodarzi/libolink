@@ -10,5 +10,28 @@
     "getStart": "Get Start",
     "readMore": "Read More",
     "appPreviewAlt": "Libolink app preview"
+  },
+  "Auth": {
+    "title": "Welcome To book Country",
+    "subtitle": "If the world of books were a nation, readers would be its citizens—and LEXO would be its capital.",
+    "signUp": "Sign up",
+    "signIn": "Sign in",
+    "logoAlt": "Libolink",
+    "email": "Email",
+    "emailPlaceholder": "Example@email.com",
+    "username": "Username",
+    "usernamePlaceholder": "At least 8 characters",
+    "password": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "confirmPassword": "Re-enter password",
+    "confirmPasswordPlaceholder": "At least 8 characters",
+    "forgotPassword": "Forgot Password?",
+    "signInButton": "Sign in",
+    "signUpButton": "Sign up",
+    "signInSuccess": "Signed in successfully!",
+    "signUpSuccess": "Account created successfully!",
+    "orDivider": "Or",
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithFacebook": "Sign in with Facebook"
   }
 }
