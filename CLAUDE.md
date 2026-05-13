@@ -70,6 +70,8 @@ Only add `"use client"` when the component needs:
 - Prefer named exports for components
 - Use `async/await` over `.then()` chains
 - Never suggest installing a new package without asking first
+- **Never use `import * as React from "react"`** — always import exactly what is needed: `import { useState, forwardRef, type ComponentProps } from "react"`
+- **Never declare types or interfaces inside component files** — all types go in `types/`
 
 ## Tailwind CSS v4 Notes
 - Config is in `app/globals.css` (not `tailwind.config.ts` — v4 uses CSS-based config)
@@ -134,6 +136,16 @@ Everything else stays the same — no component changes needed.
 
 ## Tailwind Scale Rule
 - **Always use Tailwind's built-in scale.** Write `max-w-120`, not `max-w-[480px]`. Use bracket (arbitrary) values only when no built-in equivalent exists.
+
+## Package Management
+- **Before installing any package, check version compatibility** against the existing stack. Verify peer dependencies, check the package's release notes for breaking changes, and test with a quick node import if uncertain. Example failure: `zod@4.4.x` breaks `@hookform/resolvers@5.2.2` because the resolver was compiled against Zod 4.3.x types.
+- Never suggest installing a new package without asking first.
+
+## Git Workflow
+- **Never commit directly to `dev` or `main`/`master`.** Always create a new branch first.
+- **Always create a branch before starting any new feature, fix, or refactor.** Branch names must be descriptive: `feat/auth-forms`, `fix/input-border`, `refactor/types-folder`.
+- **Commit step by step.** After completing a logical unit of work, ask the user if the step is done before committing. Do not batch unrelated changes into one commit.
+- Commit messages follow conventional commits: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
 
 ## Key Reminders
 - This is a monorepo-free single Next.js app
