@@ -20,8 +20,10 @@ Libolink is a book-centric social network where readers discover new reads, shar
 | Styling | Tailwind CSS v4 + shadcn/ui (new-york) |
 | UI Primitives | Radix UI |
 | Icons | Lucide React |
+| Forms | React Hook Form + Zod v4 |
 | Server State | React Server Components + `async/await` |
 | Client State | TanStack Query v5 |
+| i18n | Custom `getDictionary()` — zero-package, next-intl-compatible API |
 | Package Manager | pnpm |
 
 ## Getting Started
@@ -41,16 +43,22 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Project Structure
 
 ```
-app/                  # Next.js App Router — pages and layouts (RSC by default)
+app/
+  (auth)/             # Auth route group — sign-in and sign-up pages (no Header)
+  (landing)/          # Landing route group — public pages (with Header)
+  layout.tsx          # Root layout — Providers only
 components/
-  landing/            # Landing page sections (Header, Hero, …)
+  auth/               # Auth forms and tab switcher ("use client")
+  landing/            # Landing page sections (Header, Hero)
   ui/                 # shadcn/ui primitives customized to Libolink design system
-lib/                  # Business logic, data helpers, utilities
-hooks/                # Custom React hooks
+lib/                  # Business logic, Zod schemas, utilities, i18n helper
+types/                # All TypeScript interfaces — never declared inside components
+messages/
+  en.json             # Single source of truth for all UI strings
 public/               # Static assets
 ```
 
-> Path alias `@/` maps to the project root.
+> Path alias `@/` maps to the project root. Full structure: [`STRUCTURE.md`](STRUCTURE.md)
 
 ## Design System
 
@@ -92,3 +100,5 @@ pnpm lint       # Run ESLint
 - **Tailwind built-in scale** — prefer `max-w-120` over `max-w-[480px]`; arbitrary values only when no built-in equivalent exists
 - **shadcn/ui components** are installed via `pnpm dlx shadcn@latest add <component>` then edited directly — no duplicate overrides
 - **Data fetching** in Server Components via `async/await`; TanStack Query only for mutations, polling, and optimistic updates
+- **Types** are never declared inside component files — all interfaces live in `types/`
+- **Git workflow** — always branch from `dev`; never commit directly to `dev` or `main`
