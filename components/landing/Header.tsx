@@ -15,16 +15,20 @@ export async function Header() {
           width={205}
           height={59}
           priority
-          className="w-[140px] sm:w-[180px] h-auto"
+          className="w-35 sm:w-45 h-auto"
         />
       </Link>
 
       <nav className="flex items-center gap-3 sm:gap-4">
         <Button variant="ghost" asChild>
-          <Link href="/signup">{t("signUp")}</Link>
+          <Link href="/signup" prefetch>
+            {t("signUp")}
+          </Link>
         </Button>
         <Button asChild>
-          <Link href="/login">{t("signIn")}</Link>
+          <Link href="/login" prefetch>
+            {t("signIn")}
+          </Link>
         </Button>
       </nav>
     </header>
