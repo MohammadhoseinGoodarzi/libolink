@@ -143,7 +143,7 @@ Everything else stays the same — no component changes needed.
 
 ## Git Workflow
 - **Never commit directly to `dev` or `main`/`master`.** Always create a new branch first.
-- **Always create a branch before starting any new feature, fix, or refactor.** Branch names must be descriptive: `feat/auth-forms`, `fix/input-border`, `refactor/types-folder`.
+- **Always create a branch from `dev`** before starting any new feature, fix, or refactor. Branch names must be descriptive: `feat/auth-forms`, `fix/input-border`, `refactor/types-folder`.
 - **Commit step by step.** After completing a logical unit of work, ask the user if the step is done before committing. Do not batch unrelated changes into one commit.
 - Commit messages follow conventional commits: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
 

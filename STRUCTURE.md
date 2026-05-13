@@ -10,140 +10,64 @@ libolink/
 │
 ├── app/                                   # Next.js App Router (RSC by default)
 │   │
-│   ├── (auth)/                            # Route group — no shared layout
+│   ├── (auth)/                            # Route group — shared auth layout (no Header)
+│   │   ├── layout.tsx                     # Two-column layout: left image panel + right form
 │   │   ├── login/
 │   │   │   └── page.tsx
-│   │   └── register/
+│   │   └── signup/
 │   │       └── page.tsx
 │   │
-│   ├── (main)/                            # Route group — authenticated app shell
-│   │   ├── layout.tsx                     # Sidebar + nav (server)
-│   │   │
-│   │   ├── feed/
-│   │   │   ├── page.tsx
-│   │   │   └── loading.tsx
-│   │   │
-│   │   ├── profile/
-│   │   │   └── [username]/
-│   │   │       ├── page.tsx
-│   │   │       └── loading.tsx
-│   │   │
-│   │   ├── books/
-│   │   │   ├── page.tsx                   # Browse / discover books
-│   │   │   └── [id]/
-│   │   │       └── page.tsx               # Book detail + reviews
-│   │   │
-│   │   ├── events/
-│   │   │   ├── page.tsx
-│   │   │   ├── loading.tsx
-│   │   │   └── [id]/
-│   │   │       └── page.tsx
-│   │   │
-│   │   └── marketplace/
-│   │       ├── page.tsx
-│   │       ├── loading.tsx
-│   │       └── [id]/
-│   │           └── page.tsx               # Single listing
+│   ├── (landing)/                         # Route group — public landing pages (with Header)
+│   │   ├── layout.tsx                     # Wraps children with <Header />
+│   │   └── page.tsx                       # Landing / home page
 │   │
-│   ├── api/                               # Route handlers
-│   │   ├── auth/
-│   │   │   └── [...nextauth]/
-│   │   │       └── route.ts
-│   │   ├── feed/
-│   │   │   └── route.ts
-│   │   ├── events/
-│   │   │   └── route.ts
-│   │   └── marketplace/
-│   │       └── route.ts
-│   │
-│   ├── layout.tsx                         # Root layout — Providers + font
-│   ├── page.tsx                           # Landing page (public)
+│   ├── layout.tsx                         # Root layout — Providers + font only
 │   ├── globals.css                        # Tailwind v4 config + design tokens
-│   ├── error.tsx
-│   └── not-found.tsx
+│   └── favicon.ico
 │
 ├── components/
 │   │
 │   ├── ui/                                # shadcn primitives — edited to Libolink design
 │   │   ├── button.tsx
-│   │   ├── card.tsx
-│   │   ├── input.tsx
-│   │   ├── avatar.tsx
-│   │   ├── badge.tsx
-│   │   ├── dialog.tsx
-│   │   └── ...                            # add via: pnpm dlx shadcn@latest add <name>
+│   │   ├── form-field.tsx                 # label + input slot + error/action row
+│   │   └── input.tsx                      # default + auth variants (cva)
+│   │
+│   ├── auth/                              # Auth feature components ("use client")
+│   │   ├── AuthTabs.tsx                   # Sign in / Sign up tab switcher
+│   │   ├── SignInForm.tsx                 # RHF form with email + password
+│   │   └── SignUpForm.tsx                 # RHF form with email + username + passwords
 │   │
 │   ├── landing/                           # Public landing page sections
 │   │   ├── Header.tsx
 │   │   └── Hero.tsx
 │   │
-│   ├── feed/                              # Social feed
-│   │   ├── PostCard.tsx
-│   │   ├── PostList.tsx
-│   │   └── CreatePost.tsx                 # "use client" — has form state
-│   │
-│   ├── profile/
-│   │   ├── ProfileHeader.tsx
-│   │   ├── ReadingList.tsx
-│   │   └── ReviewList.tsx
-│   │
-│   ├── books/
-│   │   ├── BookDetail.tsx
-│   │   └── ReviewCard.tsx
-│   │
-│   ├── events/
-│   │   ├── EventCard.tsx
-│   │   └── EventList.tsx
-│   │
-│   ├── marketplace/
-│   │   ├── ListingCard.tsx
-│   │   ├── ListingGrid.tsx
-│   │   └── CreateListing.tsx             # "use client" — has form state
-│   │
-│   ├── shared/                            # Cross-domain reusable components
-│   │   ├── BookCard.tsx
-│   │   ├── UserAvatar.tsx
-│   │   └── SearchBar.tsx                 # "use client" — has input state
-│   │
 │   └── providers.tsx                      # "use client" — QueryClientProvider wrapper
 │
 ├── lib/
-│   ├── utils.ts                           # cn() helper (clsx + tailwind-merge)
+│   ├── auth.ts                            # Zod schemas (signIn/signUp) + service stubs
+│   ├── dictionary.ts                      # getDictionary() — i18n helper (mirrors next-intl API)
 │   ├── query-client.ts                    # makeQueryClient / getQueryClient
-│   │
-│   ├── api/                               # Server-side fetch functions (used in RSC)
-│   │   ├── feed.ts
-│   │   ├── books.ts
-│   │   ├── events.ts
-│   │   ├── marketplace.ts
-│   │   └── profile.ts
-│   │
-│   └── validators/                        # Zod schemas — shared by client + server
-│       ├── post.ts
-│       ├── event.ts
-│       └── listing.ts
+│   ├── utils.ts                           # cn() helper (clsx + tailwind-merge)
+│   └── zod-resolver.ts                    # Custom RHF resolver — bridges Zod v4 + react-hook-form
 │
-├── hooks/                                 # Client-side React Query hooks (mutations, polling)
-│   ├── use-feed.ts
-│   ├── use-events.ts
-│   ├── use-marketplace.ts
-│   └── use-profile.ts
+├── types/                                 # All TypeScript interfaces and domain types
+│   ├── auth.ts                            # SignInFormStrings, SignUpFormStrings, AuthTabsProps, etc.
+│   └── ui.ts                             # FormFieldProps
 │
-├── types/                                 # TypeScript interfaces and domain types
-│   ├── book.ts
-│   ├── user.ts
-│   ├── event.ts
-│   ├── listing.ts
-│   └── post.ts
+├── messages/
+│   └── en.json                            # Single source of truth for all UI strings
 │
 ├── public/
-│   └── logo.svg
+│   ├── logo.svg
+│   ├── app-preview.png
+│   └── app-preview-side.png               # Left panel image on auth pages
 │
-├── global.d.ts                            # declare module "*.css"
-├── next-env.d.ts                          # auto-generated by Next.js — do not edit
+├── global.d.ts                            # Global type declarations
+├── next-env.d.ts                          # Auto-generated by Next.js — do not edit
 ├── next.config.ts
 ├── tsconfig.json
 ├── postcss.config.mjs
+├── eslint.config.mjs
 ├── components.json                        # shadcn config
 ├── package.json
 ├── pnpm-lock.yaml
@@ -159,14 +83,14 @@ libolink/
 |---|---|
 | `components/ui/` | shadcn primitives — install then edit directly for Libolink design |
 | `components/<domain>/` | Feature UI — pure presentation, no business logic |
-| `components/shared/` | Components used by more than one domain |
-| `lib/api/` | All data-fetching functions — called from RSC `async` components |
-| `lib/validators/` | Zod schemas — single source of truth for shape validation |
-| `hooks/` | React Query hooks — mutations and client-side state only |
-| `types/` | TypeScript interfaces — imported by lib, hooks, and components |
+| `lib/` | All business logic, data-fetching helpers, Zod schemas, utilities |
+| `lib/auth.ts` | Auth Zod schemas + typed service stubs (replace stubs when backend is ready) |
+| `types/` | All TypeScript interfaces — never declare types inside component files |
+| `messages/en.json` | Every user-visible string — never hardcode strings in components |
 
 ## Boundaries
-- Components never import from `lib/api/` directly on the client — use hooks for that
-- `hooks/` are only used in `"use client"` components
-- Server Components call `lib/api/` functions directly with `async/await`
-- No logic in components — extract to `lib/` or `hooks/`
+- Components never contain business logic — extract to `lib/`
+- `"use client"` is pushed to the leaves — only when `useState`, `useEffect`, or browser APIs are needed
+- Server Components call `lib/` functions directly with `async/await`
+- Client Components receive strings as props from Server Component pages (i18n pattern)
+- Types are never declared inside component files — all interfaces live in `types/`
