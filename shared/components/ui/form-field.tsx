@@ -1,4 +1,4 @@
-import type { FormFieldProps } from "@/types/ui";
+import type { FormFieldProps } from "@/shared/types/ui";
 
 export function FormField({ label, htmlFor, error, action, children }: FormFieldProps) {
   return (

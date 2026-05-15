@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@/lib/zod-resolver";
 
-import { signUp, signUpSchema, type SignUpInput } from "@/lib/auth";
-import type { SignUpFormProps } from "@/types/auth";
-import { Button } from "@/components/ui/button";
-import { FormField } from "@/components/ui/form-field";
-import { Input } from "@/components/ui/input";
+import { valibotResolver } from "@/shared/validations/valibot-resolver";
+import { signUp } from "../services/auth-service";
+import { signUpSchema, type SignUpInput } from "../validations/auth-schemas";
+import type { SignUpFormProps } from "../types";
+import { Button } from "@/shared/components/ui/button";
+import { FormField } from "@/shared/components/ui/form-field";
+import { Input } from "@/shared/components/ui/input";
 
 export function SignUpForm({ strings }: SignUpFormProps) {
   const [success, setSuccess] = useState(false);
@@ -21,7 +22,7 @@ export function SignUpForm({ strings }: SignUpFormProps) {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<SignUpInput>({
-    resolver: zodResolver(signUpSchema),
+    resolver: valibotResolver(signUpSchema),
     defaultValues: { email: "", username: "", password: "", confirmPassword: "" },
   });
 

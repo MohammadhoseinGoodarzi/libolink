@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@/lib/zod-resolver";
 import Link from "next/link";
 
-import { signIn, signInSchema, type SignInInput } from "@/lib/auth";
-import type { SignInFormProps } from "@/types/auth";
-import { Button } from "@/components/ui/button";
-import { FormField } from "@/components/ui/form-field";
-import { Input } from "@/components/ui/input";
+import { valibotResolver } from "@/shared/validations/valibot-resolver";
+import { signIn } from "../services/auth-service";
+import { signInSchema, type SignInInput } from "../validations/auth-schemas";
+import type { SignInFormProps } from "../types";
+import { Button } from "@/shared/components/ui/button";
+import { FormField } from "@/shared/components/ui/form-field";
+import { Input } from "@/shared/components/ui/input";
 
 function GoogleIcon() {
   return (
@@ -55,7 +56,7 @@ export function SignInForm({ strings }: SignInFormProps) {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<SignInInput>({
-    resolver: zodResolver(signInSchema),
+    resolver: valibotResolver(signInSchema),
     defaultValues: { email: "", password: "" },
   });
 

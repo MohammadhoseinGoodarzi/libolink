@@ -1,7 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { getDictionary } from "@/lib/dictionary";
 import Image from "next/image";
 import Link from "next/link";
+
+import { Button } from "@/shared/components/ui/button";
+import { getDictionary } from "@/shared/i18n/dictionary";
 
 export async function Header() {
   const t = await getDictionary("Header");
@@ -10,7 +11,7 @@ export async function Header() {
     <header className="flex items-center justify-between px-4 sm:px-8 h-22.75 bg-white">
       <Link href="/" className="shrink-0">
         <Image
-          src="/logo.svg"
+          src="/assets/images/logo.svg"
           alt={t("logoAlt")}
           width={205}
           height={59}
