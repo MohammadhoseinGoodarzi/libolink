@@ -1,5 +1,5 @@
-import { getDictionary } from "@/lib/dictionary";
-import { SignUpForm } from "@/components/auth/SignUpForm";
+import { getDictionary } from "@/shared/i18n/dictionary";
+import { SignUpForm } from "@/features/auth";
 
 export default async function SignUpPage() {
   const t = await getDictionary("Auth");

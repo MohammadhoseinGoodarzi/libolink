@@ -1,7 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { getDictionary } from "@/lib/dictionary";
 import Image from "next/image";
 import Link from "next/link";
+
+import { Button } from "@/shared/components/ui/button";
+import { getDictionary } from "@/shared/i18n/dictionary";
 
 export async function Hero() {
   const t = await getDictionary("Hero");
@@ -27,7 +28,7 @@ export async function Hero() {
 
       <div className="w-full max-w-6xl overflow-hidden rounded-t-2xl">
         <Image
-          src="/app-preview.png"
+          src="/assets/images/app-preview.png"
           alt={t("appPreviewAlt")}
           width={1045}
           height={534}

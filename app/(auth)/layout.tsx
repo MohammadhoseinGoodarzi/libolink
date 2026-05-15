@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { AuthTabs } from "@/components/auth/AuthTabs";
-import { getDictionary } from "@/lib/dictionary";
+import { AuthTabs } from "@/features/auth";
+import { getDictionary } from "@/shared/i18n/dictionary";
 
 export default async function AuthLayout({
   children,
@@ -17,7 +17,7 @@ export default async function AuthLayout({
       <div className="hidden xl:flex xl:w-[30%] shrink-0 flex-col h-screen overflow-hidden pt-6">
         <div className="relative flex-1">
           <Image
-            src="/app-preview-side.png"
+            src="/assets/images/app-preview-side.png"
             alt=""
             fill
             className="object-contain object-top-left"
@@ -32,7 +32,7 @@ export default async function AuthLayout({
         <div className="flex justify-end">
           <Link href="/">
             <Image
-              src="/logo.svg"
+              src="/assets/images/logo.svg"
               alt={t("logoAlt")}
               width={140}
               height={40}

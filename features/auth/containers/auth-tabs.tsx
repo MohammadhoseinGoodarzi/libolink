@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { AuthTabsProps } from "@/types/auth";
-import { Button } from "@/components/ui/button";
+
+import type { AuthTabsProps } from "../types";
+import { Button } from "@/shared/components/ui/button";
 
 export function AuthTabs({ signUpLabel, signInLabel }: AuthTabsProps) {
   const pathname = usePathname();
