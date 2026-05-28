@@ -51,12 +51,12 @@ export default async function AuthLayout({
             </div>
 
             {/* Heading */}
-            <h1 className="mb-3 text-center text-3xl font-bold text-brand-primary">
+            <h1 className="mb-3 text-center text-3xl font-bold text-primary">
               {t("title")}
             </h1>
 
             {/* Subtitle */}
-            <p className="mb-8 text-center text-sm leading-relaxed text-brand-gray">
+            <p className="mb-8 text-center text-sm leading-relaxed text-muted-foreground">
               {t("subtitle")}
             </p>
 

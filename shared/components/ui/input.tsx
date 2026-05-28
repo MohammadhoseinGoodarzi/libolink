@@ -10,7 +10,7 @@ const inputVariants = cva(
       variant: {
         default:
           "h-9 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring md:text-sm",
-        auth: "h-13 rounded-full bg-brand-surface border border-brand-primary/50 px-5 text-sm placeholder:text-brand-gray focus-visible:ring-2 focus-visible:ring-brand-primary/30 focus-visible:border-brand-primary/70",
+        auth: "h-13 rounded-full bg-secondary border border-input px-5 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary/70",
       },
     },
     defaultVariants: {

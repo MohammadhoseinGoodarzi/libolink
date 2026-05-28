@@ -1,5 +1,9 @@
 # Libolink — Design System
 
+> **For the project owner:** you don't write code; you brief Claude. The shortest useful brief answers five things — what page, signed in or out, what goes on it, anything you want or don't want, and whether you want options. The rest of this file is for Claude.
+>
+> **For Claude (every chat):** read this file + `PROJECT_MEMORY.md` + `CLAUDE.md` + `ARCHITECTURE.md` before doing UI work. Defer to this file on visuals; whenever you change it, tell the user explicitly with 🔔 so they update the copy in their repo.
+
 ## 1. Scope of this document
 
 This document covers Libolink's **visual layer**: color tokens, typography, spacing, shadcn/ui primitives in `shared/components/ui/`, and the UI composition patterns built on top of them. It does **not** restate rules that live elsewhere:
@@ -50,32 +54,36 @@ These are **primitive tokens**. Feature components should not read them directly
 
 Defined in `:root` and `.dark` blocks (`app/globals.css` lines 58–127). These map shadcn's contract (`bg-background`, `text-foreground`, `bg-primary`, etc.) onto Libolink's brand vocabulary. The current file uses **stock shadcn new-york neutral grayscale** for these tokens, which is why every Libolink component currently reaches past them to `bg-brand-*` utilities — see §10 for the gap and the recommended remap.
 
-**Target mapping (light):**
+**Locked mapping (light)** — reviewed and approved 2026-05-27. The ten brand hex values are non-negotiable; the table below shows the resolved value each semantic token carries today.
 
-| Semantic token           | Maps to                       | OKLCH (recommended)                    | Used for                                                                                                                                       |
-| ------------------------ | ----------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--background`           | white                         | `oklch(1 0 0)`                         | Page background.                                                                                                                               |
-| `--foreground`           | near-black                    | `oklch(0.145 0 0)`                     | Default body text.                                                                                                                             |
-| `--card`                 | white                         | `oklch(1 0 0)`                         | Card surface (post card, AI assistant card chrome).                                                                                            |
-| `--card-foreground`      | `--foreground`                | `oklch(0.145 0 0)`                     | Text inside a card.                                                                                                                            |
-| `--popover`              | `--card`                      | `oklch(1 0 0)`                         | Floating popover surface.                                                                                                                      |
-| `--popover-foreground`   | `--foreground`                | `oklch(0.145 0 0)`                     | —                                                                                                                                              |
-| `--primary`              | `--color-brand-primary`       | `oklch(0.225 0.038 158)` (≈ `#023618`) | Brand surfaces — header CTA, nav active pill, profile card BG.                                                                                 |
-| `--primary-foreground`   | white                         | `oklch(0.985 0 0)`                     | Text on `--primary`.                                                                                                                           |
-| `--secondary`            | `--color-brand-surface`       | `oklch(0.93 0.013 264)` (≈ `#E8EBF4`)  | Outline button BG, soft surface.                                                                                                               |
-| `--secondary-foreground` | `--primary`                   | `oklch(0.225 0.038 158)`               | Text on `--secondary`.                                                                                                                         |
-| `--muted`                | `--color-brand-gray-light`    | `oklch(0.93 0 0)` (≈ `#EAEAEA`)        | Skeleton fills, low-emphasis chips.                                                                                                            |
-| `--muted-foreground`     | `--color-brand-gray`          | `oklch(0.55 0.013 264)` (≈ `#6B7280`)  | Placeholder text, captions, timestamps.                                                                                                        |
-| `--accent`               | `--color-brand-surface-hover` | `oklch(0.91 0.014 264)`                | Hover surface inside menus/lists.                                                                                                              |
-| `--accent-foreground`    | `--primary`                   | `oklch(0.225 0.038 158)`               | —                                                                                                                                              |
-| `--destructive`          | `--color-brand-accent`        | `oklch(0.58 0.12 17)` (≈ `#C14953`)    | **Primary form CTA + true destructive actions.** This is the Libolink-specific overload — see §3.3.                                            |
-| `--border`               | neutral 200                   | `oklch(0.922 0 0)`                     | Card/divider strokes.                                                                                                                          |
-| `--input`                | `--primary` at 50%            | n/a (alpha modifier)                   | Input border. The auth input also uses this as its border source — see `shared/components/ui/input.tsx` line 13.                               |
-| `--ring`                 | `--primary` at 30%            | n/a (alpha modifier)                   | Focus ring on inputs.                                                                                                                          |
-| `--chart-1..5`           | stock shadcn                  | unchanged                              | Defined but **not yet used** — keep stock until charts ship.                                                                                   |
-| `--sidebar-*`            | stock shadcn                  | unchanged                              | Defined but **not yet used** — Libolink's sidebar is custom (see `image_2026-05-27_00-33-06.png`). Document when a sidebar primitive is built. |
+| Semantic token             | Resolved value         | Source                         | Used for                                                                                                                                       |
+| -------------------------- | ---------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--background`             | `#FFFFFF`              | white                          | Page canvas.                                                                                                                                   |
+| `--foreground`             | `#0F1B14`              | near-black, brand-green tinted | Default body text. Stays in-family with the brand instead of stark neutral.                                                                    |
+| `--card`                   | `#FFFFFF`              | white                          | Card surface (post card, AI assistant card chrome).                                                                                            |
+| `--card-foreground`        | `#0F1B14`              | → `--foreground`               | Text inside a card.                                                                                                                            |
+| `--popover`                | `#FFFFFF`              | → `--card`                     | Floating popover surface.                                                                                                                      |
+| `--popover-foreground`     | `#0F1B14`              | → `--foreground`               | —                                                                                                                                              |
+| `--primary`                | `#023618`              | `--color-brand-primary`        | Brand surfaces — header CTA, nav active pill, profile card BG.                                                                                 |
+| `--primary-foreground`     | `#FFFFFF`              | white                          | Text on `--primary`.                                                                                                                           |
+| `--secondary`              | `#E8EBF4`              | `--color-brand-surface`        | Outline button BG, pill input fill, soft surface.                                                                                              |
+| `--secondary-foreground`   | `#023618`              | `--color-brand-primary`        | Text on `--secondary`.                                                                                                                         |
+| `--muted`                  | `#EAEAEA`              | `--color-brand-gray-light`     | Skeleton fills, low-emphasis chips.                                                                                                            |
+| `--muted-foreground`       | `#6B7280`              | `--color-brand-gray`           | Placeholder text, captions, timestamps.                                                                                                        |
+| `--accent`                 | `#dde1ef`              | `--color-brand-surface-hover`  | Hover surface inside menus/lists.                                                                                                              |
+| `--accent-foreground`      | `#023618`              | `--color-brand-primary`        | —                                                                                                                                              |
+| `--destructive`            | `#C14953`              | `--color-brand-accent`         | **Primary form CTA + true destructive actions.** Libolink-specific overload — see §3.3.                                                        |
+| `--destructive-foreground` | `#FFFFFF`              | white                          | Text on `--destructive`.                                                                                                                       |
+| `--border`                 | `#EAEAEA`              | `--color-brand-gray-light`     | Card/divider strokes.                                                                                                                          |
+| `--input`                  | `rgba(2, 54, 24, 0.5)` | `--color-brand-primary` @ 50%  | Input border. Auth + pill inputs read as branded.                                                                                              |
+| `--ring`                   | `rgba(2, 54, 24, 0.3)` | `--color-brand-primary` @ 30%  | Focus ring on inputs/buttons.                                                                                                                  |
+| `--link`                   | `#1D3557`              | `--color-brand-navy`           | **Inline links + info badges** (locked 2026-05-27). New semantic token — not stock shadcn.                                                     |
+| `--chart-1..5`             | stock shadcn           | unchanged                      | Defined but **not yet used** — keep stock until charts ship.                                                                                   |
+| `--sidebar-*`              | stock shadcn           | unchanged                      | Defined but **not yet used** — Libolink's sidebar is custom (see `image_2026-05-27_00-33-06.png`). Document when a sidebar primitive is built. |
 
-**Target mapping (dark) — recommendation, dark mode not yet implemented (your requirement: design now, implement later).** Suggested values:
+_Note: previous drafts of this doc proposed OKLCH values. The locked source-of-truth above uses hex directly so colours round-trip cleanly between Figma, the showcase page, and code. OKLCH may still be used for derived values that need an alpha modifier or a lightness nudge (e.g. focus ring, dark mode)._
+
+**Target mapping (dark) — designed in full 2026-05-27, pending sign-off.** The user's brief was: design dark now using my judgment, finalise with their colours later. Current values live in `styles.css` `.dark` block and inline `<style>` in `Messages.html` / `Design System.html`. Strategy: keep brand temperature (green-tinted near-black BG, off-white foreground), lift `--primary` (green) and `--destructive` (crimson) into lightness ranges that pass AA on the dark surface, invert the surface family so `--secondary` lives in the same green-tinted hue family rather than swinging cool, switch borders/inputs to translucent white.
 
 | Token                  | Light              | Dark (proposed)         | Reason                                                       |
 | ---------------------- | ------------------ | ----------------------- | ------------------------------------------------------------ |
@@ -91,6 +99,18 @@ Defined in `:root` and `.dark` blocks (`app/globals.css` lines 58–127). These 
 | `--input`              | brand-primary/50   | `oklch(1 0 0 / 18%)`    | —                                                            |
 
 Document the proposed dark values here so Claude Code can implement them as a single `app/globals.css` edit when you're ready.
+
+### 3.4 Three-column shell + right-rail pattern (locked 2026-05-27)
+
+Most signed-in pages render inside a three-column shell:
+
+- **Left sidebar** — persistent across pages. Same content on every route: logo header → profile card (brand-primary fill) → favourite-book card → nav list (Home, Messages, Friends, Book Exchange, Clubs, Settings) → Download-the-App CTA pinned bottom. See §10.15.
+- **Middle** — the only column that changes per route.
+- **Right rail** — persistent across pages. Same content on every route: search bar pinned top → Stories → AI Assistant card → Ad/promo cards.
+
+**Documented exception:** the Messages page drops the right rail to give the conversation pane horizontal space.
+
+The shell is a single layout component, not duplicated per page. When introducing a new signed-in page, render _only_ the middle slot — do not redeclare the sidebar or right rail.
 
 ### 3.3 Usage rules
 
@@ -337,11 +357,104 @@ Stock shadcn primitives that are referenced by the design but not yet present in
 - `Label` — `<FormField>` currently uses a raw `<label>` element. Install when you need a standalone label outside `<FormField>`.
 - `Form` (the RHF-bound set) — intentionally skipped, see §7.3.
 - `Card` — Figma feed shows clear card surfaces; install when building feed UI.
-- `Avatar` — needed for profile card, story bubbles, post author.
+- `Avatar` — needed for profile card, story bubbles, post author. Pattern already prototyped in built pages, see §7.5.
 - `Tabs` — needed for Recent/Popular/Following.
 - `Dropdown`, `Dialog`, `Sheet`, `Popover` — not yet needed; install as required.
 
 Per `CLAUDE.md` §Code Style Rules: install with `pnpm dlx shadcn@latest add <name>`. Never hand-copy.
+
+### 7.5 Patterns ready for promotion (emergent from built pages)
+
+When designing pages in HTML mockups, these patterns recurred. They are not yet `shared/components/ui/` primitives, but they should become primitives the next time we touch the repo.
+
+#### `<Avatar>` — initials variant
+
+**First built in:** `Messages.html` (`components.jsx`).
+
+Used everywhere there's a person: profile card, conversation list, chat header, post author, friends grid, comments. Stock shadcn `<Avatar>` ships with image + fallback; Libolink's specifically needs a deterministic **initials** fallback because (a) most users won't have uploaded a photo, (b) the design wants visual variety, not a wall of identical gray circles.
+
+**Shape:**
+
+```ts
+interface Avatar {
+  person: {
+    name: string;
+    initials: string;
+    hue: number;
+    online?: boolean;
+    group?: boolean;
+  };
+  size?: number; // default 40
+}
+```
+
+**Visual rules:**
+
+- Background: `oklch(0.68 0.13 ${hue})` — saturation/lightness fixed for cohesion, only hue varies per person
+- Initials text: `oklch(0.20 0.05 ${hue})` — same hue, dark, readable
+- Online indicator: green dot `oklch(0.72 0.18 145)`, ring matches surface (`ring-card`)
+- Group indicator: small badge with `<Icon name="usersRound">`, `bg-primary`
+- Sizes used so far: 40 (default), 44 (list row), 80 (profile card)
+- Always render as inline SVG (works offline, scales crisp at every size)
+
+**Why not Tailwind-only:** the hue-based fill needs a CSS variable per instance, which Tailwind utilities can't express cleanly. Inline `style` is the right tool here.
+
+**When promoted:** install `pnpm dlx shadcn@latest add avatar`, then add an `AvatarInitials` variant that takes `{ initials, hue }` and renders the SVG above. Keep stock `<AvatarImage>` + `<AvatarFallback>` for the image case.
+
+#### `<MessageBubble>`
+
+**First built in:** `Messages.html` (`chat-thread.jsx`).
+
+For any chat / comment / reply UI. Two variants by author.
+
+**Visual rules:**
+
+- **Outgoing** (`mine`): `bg-primary text-primary-foreground rounded-2xl rounded-br-md px-4 py-2.5 text-sm leading-relaxed`
+- **Incoming**: `bg-card text-foreground border border-border rounded-2xl rounded-bl-md px-4 py-2.5 text-sm leading-relaxed`
+- The asymmetric corner (`rounded-br-md` / `rounded-bl-md`) is the visual "tail" pointing toward the author. No SVG tail needed.
+- Read receipt: `<Icon name="check">` (sent) or `<Icon name="checkCheck">` colored `text-primary` (read). 12 px size.
+- Stack with `max-w-[78%] sm:max-w-[68%]` so long messages wrap before they fill the column.
+
+**`kind="book"` (and other rich-content) variants:** the bubble is replaceable by a small **card** (`rounded-xl bg-background border border-border`, max-w-72). Reuse the alignment shell, swap the inner content.
+
+#### `<PillInput>` — search / generic text input
+
+**First built in:** `Messages.html` (search field).
+
+Not the auth input (which is 52 px tall `<Input variant="auth">`). This is the smaller, lighter cousin for in-page search and generic text:
+
+```
+h-11 w-full rounded-full bg-secondary border border-input
+pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground
+focus:outline-none focus:ring-2 focus:ring-ring transition-shadow
+```
+
+Leading icon at `left-4 top-1/2 -translate-y-1/2`, trailing icon/clear at `right-3`/`right-4`. Same surface tokens as the auth input — just shorter and with the search-icon affordance.
+
+**When promoted:** add as a third variant to `shared/components/ui/input.tsx`: `variant="search"` or `variant="pill"`.
+
+#### `<FilterChip>` — segmented filter pill
+
+**First built in:** `Messages.html` (All / Unread / Groups).
+
+For any horizontal row of toggle-able filters. Two states only.
+
+**Visual rules:**
+
+- Both: `h-8 px-3 rounded-full text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer`
+- Active: `bg-primary text-primary-foreground`
+- Inactive: `bg-secondary text-secondary-foreground hover:bg-accent`
+- Optional count badge inside: `min-w-4 h-4 px-1 rounded-full text-[10px]` — `bg-primary-foreground/20` when active, `bg-foreground/10` when inactive
+
+**When promoted:** new file `shared/components/ui/filter-chip.tsx` using `cva`. Two variants, no sizes (one size only).
+
+#### `<ThemeToggle>`
+
+**First built in:** `Messages.html` (`components.jsx`).
+
+Ghost button, 36 × 36, swaps `<Icon name="sun">` ↔ `<Icon name="moon">`. Persists to `localStorage` under key `libo-theme`. **Critical: the theme class must be applied synchronously before React mounts** — inline `<script>` in `<body>` that reads localStorage and sets `.dark` on `<html>`. Otherwise the first paint flashes wrong, and worse, `transition-colors` gets stuck mid-flight between OKLCH values (see §8.8).
+
+**When promoted:** new file `shared/components/ui/theme-toggle.tsx`. Place it in the app header (top-right) once a global header exists, not in every page.
 
 ---
 
@@ -442,6 +555,37 @@ Per `ARCHITECTURE.md`, every feature has an `error/` folder. Visual rule:
 - **Micro-interactions:** `active:scale-[0.98]` on pressable surfaces (already on `<Button>`); `transition-colors duration-150` on hover-color changes (already on `<Button>` and `<Input>`).
 - **Avoid:** custom keyframes, framer-motion, large staggered animations on first paint. Anything beyond `tailwindcss-animate` warrants a separate design conversation.
 
+#### Theme-toggle gotcha — OKLCH + `transition-colors`
+
+When the theme variable changes (light → dark), every element with `transition-colors` interpolates between the _old_ and _new_ OKLCH value. With pure CSS-variable–driven theming, this can leave elements **stuck mid-transition** on subsequent renders — backgrounds frozen at light values inside a dark page.
+
+**Fix:** wrap the theme swap in a brief no-transitions window.
+
+```css
+.no-transitions,
+.no-transitions * {
+  transition: none !important;
+  animation-duration: 0s !important;
+}
+```
+
+```ts
+useEffect(() => {
+  const root = document.documentElement;
+  root.classList.add("no-transitions");
+  root.classList.toggle("dark", dark);
+  void root.offsetHeight; // force reflow
+  const id = requestAnimationFrame(() =>
+    root.classList.remove("no-transitions"),
+  );
+  return () => cancelAnimationFrame(id);
+}, [dark]);
+```
+
+And apply the theme class **synchronously before React mounts** via an inline `<script>` in `<body>` (read localStorage, set `.dark` on `<html>`). This avoids a light→dark flash on first paint and prevents the transition-stuck bug from happening at mount time.
+
+First encountered in `Messages.html`; pattern documented here so future pages skip the same debugging.
+
 ### 8.9 i18n composition (visual side)
 
 The Server Component page calls `getDictionary("Namespace")` and passes strings as props to the container. Containers and components never call `getDictionary`. Canonical pattern in `app/(auth)/login/page.tsx`:
@@ -469,6 +613,9 @@ Full rules in `ARCHITECTURE.md` §i18n and `CLAUDE.md` §Internationalization.
 Checklist for Claude Code when doing UI work. Each item links to where the full reasoning lives.
 
 - [ ] **Semantic tokens only.** No `bg-white`, `text-zinc-900`, no arbitrary hex. Primitive `brand-*` tokens only for explicitly decorative surfaces (§3.3, this doc).
+- [ ] **Dark mode from day one.** Every new component is built with both `:root` and `.dark` token values working. No `dark:bg-[#…]` overrides; the dark mapping in §3.2 carries all the weight.
+- [ ] **Responsive from day one.** Mobile-first, then `sm: / md: / lg: / xl:`. No desktop-only pages.
+- [ ] **Theme toggle technique.** When a page exposes a light/dark toggle, follow the no-transitions + sync-before-mount pattern in §8.8 — without it, OKLCH transitions get stuck.
 - [ ] **Built-in Tailwind scale only.** Arbitrary `[Npx]` values only when there is no built-in equivalent (`CLAUDE.md` §Tailwind Scale Rule).
 - [ ] **`cn()` for conditional classes, `cva` for components with 2+ visual states.** Always export `*Variants` alongside the component (§8.2, §8.3, this doc).
 - [ ] **`lucide-react` for icons.** No inline SVG except third-party brand marks (§8.7, this doc; `CLAUDE.md` §Code Style Rules).
@@ -487,13 +634,13 @@ Checklist for Claude Code when doing UI work. Each item links to where the full 
 
 File-cited, actionable. Each item is a follow-up ticket.
 
-### 10.1 Semantic token layer is not wired to brand primitives
+### 10.1 Semantic token layer is not wired to brand primitives _(closed in showcase; still open in repo)_
 
 **Where:** `app/globals.css` lines 58–127.
 
-**Problem:** `:root` and `.dark` use stock shadcn neutral grayscale for `--primary`, `--secondary`, `--destructive`, etc. As a result, every Libolink component bypasses semantic tokens and reaches for `bg-brand-*` utilities (`button.tsx`, `input.tsx`, `form-field.tsx`, `sign-in-form.tsx`, etc.). The "use semantic tokens only" rule is currently unenforceable because the semantic tokens don't carry the brand.
+**Status (2026-05-27):** the showcase + Messages page in this Claude project now ship the locked hex mapping (§3.2). The **real repo** (`app/globals.css`) has not been updated yet — user owns that step.
 
-**Fix:** Edit `:root` (and add `.dark` values from §3.2) so `--primary: var(--color-brand-primary)`, `--destructive: var(--color-brand-accent)`, `--secondary: var(--color-brand-surface)`, `--muted-foreground: var(--color-brand-gray)`, etc. Then refactor `button.tsx`/`input.tsx`/`form-field.tsx` to consume `bg-primary`, `bg-destructive`, `border-input`, `text-destructive` instead of brand utilities. The brand utilities stay defined (decorative use only).
+🔔 **DESIGN_SYSTEM.md changed — please update `app/globals.css` in your repo and commit it.** Copy the resolved values from §3.2's locked-mapping table into `:root`, and the dark values into `.dark`. Then refactor `button.tsx`/`input.tsx`/`form-field.tsx` to consume `bg-primary`, `bg-destructive`, `border-input`, `text-destructive` instead of `bg-brand-*` utilities. The brand utilities stay defined (decorative use only).
 
 ### 10.2 Arbitrary values in `button.tsx`
 
@@ -538,28 +685,19 @@ File-cited, actionable. Each item is a follow-up ticket.
 
 **Problem:** `--font-sans: var(--font-geist-sans)` resolves to nothing because no `next/font` call sets `--font-geist-sans`. The browser falls back to system sans.
 
-**Fix:** In `app/layout.tsx`, add:
+**Status (2026-05-27):** **blocked on strict package policy.** Adding `geist` to `package.json` requires explicit user approval. Until then, the system sans fallback is the intentional state. Showcase + Messages pages load Geist directly from Google Fonts as a temporary measure (this is a HTML-only dependency — doesn't affect the repo).
 
-```ts
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
-
-<html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
-```
-
-Then add `geist` to `package.json` dependencies (`CLAUDE.md` §Package Management — ask first).
-
-### 10.7 Dark mode is scaffolded but not implemented
+### 10.7 Dark mode is scaffolded but not implemented _(designed; pending sign-off 2026-05-27)_
 
 **Where:** `app/globals.css` `.dark` block (lines 96–127) uses stock shadcn dark grays. No theme toggle exists in the app.
 
-**Status:** Intentional per your direction — "design now, implement later". The proposed brand-aware dark values are in §3.2. When implementing, also add a `useTheme` hook + theme atom in `shared/store/`, and a `<ThemeProvider>` in `shared/providers/`.
+**Status (2026-05-27):** **dark mode is now fully designed in the showcase + Messages page** (proposed OKLCH values in §3.2 dark table). User will provide final hex values; current proposal stands until then. When implementing in the repo, also add a `useTheme` hook + theme atom in `shared/store/`, and a `<ThemeProvider>` in `shared/providers/`.
 
-### 10.8 `--color-brand-navy` (`#1D3557`) is defined but unused
+### 10.8 `--color-brand-navy` (`#1D3557`) is defined but unused _(closed 2026-05-27)_
 
 **Where:** `app/globals.css` line 11.
 
-**Suggested role:** Inline links (`<a>` inside body copy), informational badges, or chart-3 stand-in. Pick one and document the choice when you first need it, rather than leaving it floating.
+**Status:** Resolved. Brand-navy now powers the `--link` semantic token (inline links, info badges). Locked 2026-05-27 — see §3.2.
 
 ### 10.9 Container/component boundary is blurred in auth
 
@@ -598,6 +736,12 @@ Then add `geist` to `package.json` dependencies (`CLAUDE.md` §Package Managemen
 **Where:** `image_2026-05-27_00-31-58.png` shows the Forgot Password screen; `features/auth/containers/sign-in-form.tsx` line 95 links to `/forgot-password`; no `app/(auth)/forgot-password/page.tsx` exists in the imported file tree.
 
 **Status:** Known missing page. When building it, follow the same Page → Container → Component split (§10.9), reuse `<FormField>` + `<Input variant="auth">` + `<Button variant="destructive">`, and add a `ForgotPassword` namespace to `messages/en.json`.
+
+### 10.15 Sidebar + right-rail components are not yet primitives
+
+**Where:** No `shared/components/layout/sidebar.tsx` or `right-rail.tsx` in the imported tree.
+
+**Status (2026-05-27):** The Design System showcase contains canonical previews of every piece (profile card, favourite-book card, nav item, download CTA, search bar, story rail, AI assistant card, ad card) and the composed shell. When promoting to the repo, build them as a layout-level pair (`<AppShell>` + `<LeftSidebar>` + `<RightRail>`) so individual pages just render the middle slot. The Messages page's documented exception (no right rail) becomes a `<AppShell variant="messages">` flag.
 
 ---
 

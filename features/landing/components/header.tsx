@@ -8,7 +8,7 @@ export async function Header() {
   const t = await getDictionary("Header");
 
   return (
-    <header className="flex items-center justify-between px-4 sm:px-8 h-22.75 bg-white">
+    <header className="flex items-center justify-between px-4 sm:px-8 h-22.75 bg-background">
       <Link href="/" className="shrink-0">
         <Image
           src="/assets/images/logo.svg"
