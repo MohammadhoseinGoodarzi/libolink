@@ -8,7 +8,7 @@ export function FormField({ label, htmlFor, error, action, children }: FormField
       </label>
       {children}
       <div className="flex h-4 items-center justify-between">
-        <p className="text-xs text-brand-accent">{error}</p>
+        <p className="text-xs text-destructive">{error}</p>
         {action}
       </div>
     </div>
