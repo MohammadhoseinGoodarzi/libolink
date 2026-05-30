@@ -1,18 +1,15 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { AuthTabs } from "@/features/auth";
-import { getDictionary } from "@/shared/i18n/dictionary";
+import { AuthTabs } from '@/features/auth';
+import { ThemeToggle } from '@/shared/components/theme-toggle';
+import { getDictionary } from '@/shared/i18n/dictionary';
 
-export default async function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const t = await getDictionary("Auth");
+export default async function AuthLayout({ children }: { children: React.ReactNode }) {
+  const t = await getDictionary('Auth');
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-background">
       {/* Left panel — xl+ only, max 30%, h-screen caps height so image never causes scroll */}
       <div className="hidden xl:flex xl:w-[30%] shrink-0 flex-col h-screen overflow-hidden pt-6">
         <div className="relative flex-1">
@@ -28,12 +25,13 @@ export default async function AuthLayout({
 
       {/* Right panel */}
       <div className="flex flex-1 flex-col px-8 py-6">
-        {/* Logo */}
-        <div className="flex justify-end">
+        {/* Logo + theme toggle */}
+        <div className="flex items-center justify-end gap-2">
+          <ThemeToggle />
           <Link href="/">
             <Image
-              src="/assets/images/logo.svg"
-              alt={t("logoAlt")}
+              src="/assets/images/logo.png"
+              alt={t('logoAlt')}
               width={140}
               height={40}
               priority
@@ -47,17 +45,15 @@ export default async function AuthLayout({
           <div className="w-full max-w-sm">
             {/* Tab switcher */}
             <div className="mb-8">
-              <AuthTabs signUpLabel={t("signUp")} signInLabel={t("signIn")} />
+              <AuthTabs signUpLabel={t('signUp')} signInLabel={t('signIn')} />
             </div>
 
             {/* Heading */}
-            <h1 className="mb-3 text-center text-3xl font-bold text-primary">
-              {t("title")}
-            </h1>
+            <h1 className="mb-3 text-center text-3xl font-bold text-primary">{t('title')}</h1>
 
             {/* Subtitle */}
             <p className="mb-8 text-center text-sm leading-relaxed text-muted-foreground">
-              {t("subtitle")}
+              {t('subtitle')}
             </p>
 
             {/* Form (login/page or signup/page) */}

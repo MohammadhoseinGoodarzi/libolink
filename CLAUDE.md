@@ -29,18 +29,18 @@
 | valibot | ^1.4.0 |
 | jotai | ^2.20.0 |
 | jotai-tanstack-query | ^0.11.0 |
-| eslint | ^9 |
-| eslint-config-next | 16.1.6 |
+| @biomejs/biome | 2.3.15 |
 
 ## Tech Stack Summary
 - **UI:** React 19, Tailwind CSS v4, shadcn/ui (new-york style, neutral base)
+- **Font:** Vazirmatn variable font loaded via `next/font/local`, bound to `--font-vazirmatn`
 - **Icons:** Lucide React
 - **Utilities:** clsx, tailwind-merge, class-variance-authority (cva)
 - **Forms:** React Hook Form + Valibot (`valibotResolver` from `@hookform/resolvers/valibot`, re-exported at `shared/validations/valibot-resolver.ts`)
 - **Server state:** TanStack Query v5
 - **Client state:** Jotai v2 — feature atoms in `features/<name>/store/`, global atoms in `shared/store/`
 - **Query atoms:** jotai-tanstack-query — `atomWithQuery` / `atomWithMutation` when query state needs to live in atoms
-- **Linting:** ESLint 9 with eslint-config-next
+- **Linting / Formatting:** Biome 2 (`biome.json`) — replaces ESLint. `pnpm lint` runs `biome check .`; `pnpm format` runs `biome format --write .`
 
 ## Modular Architecture
 
@@ -54,7 +54,7 @@ import direction:  app/ → features/* → shared/
 ### Directory Layout
 ```
 app/          Next.js routing ONLY — thin pages, no logic
-features/     Vertical feature slices (auth, landing, …)
+features/     Vertical feature slices (auth, home, landing)
 shared/       Cross-feature shared code — no feature knowledge
 public/assets/ Static assets (fonts, images, icons)
 messages/     i18n strings (en.json)
@@ -106,10 +106,16 @@ features/…/components/  pure presentational — no state, only props
 ```ts
 import { cn }              from "@/shared/utils/cn";
 import { Button }          from "@/shared/components/ui/button";
+import { Input }           from "@/shared/components/ui/input";
+import { PasswordInput }   from "@/shared/components/ui/password-input";
+import { SearchInput }     from "@/shared/components/ui/search-input";
+import { FormField }       from "@/shared/components/ui/form-field";
+import { ThemeToggle }     from "@/shared/components/theme-toggle";
 import { getDictionary }   from "@/shared/i18n/dictionary";
 import { getQueryClient }  from "@/shared/providers/query-client";
 import { ROUTES }          from "@/shared/constants/routes";
 import { SignInForm }      from "@/features/auth";
+import { DashboardShell }  from "@/features/home";
 ```
 
 ## React Server Components (RSC) — #1 Priority
@@ -141,10 +147,45 @@ Only add `"use client"` when the component needs:
 - **Never use `import * as React from "react"`** — always import exactly what is needed: `import { useState, forwardRef, type ComponentProps } from "react"`
 - **Never declare types or interfaces inside component files** — all types go in `features/<name>/types/` or `shared/types/`
 
+## Component Rules — Always Use Shared UI
+- **Never use raw `<button>` elements** outside of primitive UI components. Always use `<Button>` from `@/shared/components/ui/button`.
+  - If the style is close to an existing variant, add a `className` override.
+  - If it's a new reusable pattern, add a variant or size to `button.tsx`.
+  - If it's truly different and reusable, create a new component in `shared/components/ui/`.
+- **Never use raw `<input>` elements** outside of primitive UI components. Use `<Input>`, `<PasswordInput>`, or `<SearchInput>`.
+- **`<Button>` defaults to `type="button"`** — always pass `type="submit"` explicitly on form submit buttons.
+
+## Button Variants & Sizes
+
+| Variant | Visual | Used for |
+|---|---|---|
+| `default` | Green fill, white text | Header CTAs, nav actions |
+| `outline` | Surface fill, green text | Social auth, secondary actions |
+| `ghost` | Transparent, green text + hover surface | Icon buttons, tab navigation |
+| `destructive` | Crimson fill, white text, large | Primary form submit (sign-in, sign-up) |
+| `post` | Brand-primary, glow shadow | Feed composer post button |
+
+| Size | Dimensions | Used for |
+|---|---|---|
+| `default` | h-42 px-6 | Standard CTAs |
+| `sm` | h-8 px-3 | Compact buttons |
+| `lg` | h-52 px-8 | Large buttons |
+| `icon` | 36 × 36 | Standard icon buttons |
+| `icon-sm` | 32 × 32 | Small icon buttons (nav hamburger, drawer close, theme toggle) |
+| `post` | h-19 px-2.5 | Inline composer submit |
+
 ## Tailwind CSS v4 Notes
 - Config is in `app/globals.css` (not `tailwind.config.ts` — v4 uses CSS-based config)
 - PostCSS is handled via `@tailwindcss/postcss`
 - CSS variables are enabled for theming
+- Dark mode: `@custom-variant dark (&:is(.dark *))` — the `.dark` class is set on `<html>`
+
+## Dark Mode Implementation
+- **No-flash script** in `app/layout.tsx` `<body>`: reads `localStorage("theme")`, sets `.dark` on `<html>` synchronously before React mounts. This is the only reliable way to avoid flash — do not replace with `useEffect`.
+- **`suppressHydrationWarning`** on `<html>`: safe — scoped only to the `class` attribute diff caused by the no-flash script.
+- **`ThemeToggle`** (`shared/components/theme-toggle.tsx`): uses `useSyncExternalStore` with a `MutationObserver` on `document.documentElement.classList`. `getServerSnapshot = () => false` ensures server/client agree during hydration.
+- **CSS tokens**: `.dark {}` block in `globals.css` overrides all semantic tokens — `--background: #051a0e`, `--card: #0c2218`, `--secondary: #162d1e`.
+- **ThemeToggle must be on every page**: home sidebar, auth layout, landing header.
 
 ## shadcn/ui Notes
 - Style: `new-york`
@@ -159,9 +200,18 @@ Only add `"use client"` when the component needs:
 pnpm dev        # Start dev server
 pnpm build      # Production build
 pnpm start      # Start production server
-pnpm lint       # Run ESLint
+pnpm lint       # Run Biome (check)
+pnpm format     # Run Biome (format + write)
 pnpm dlx shadcn@latest add <component>  # Add shadcn component
 ```
+
+## Biome Configuration
+- Config: `biome.json` — replaces `eslint.config.mjs` (deleted)
+- Single quotes, trailing commas, semicolons, 2-space indent, 100-char line width
+- `organizeImports` enabled — import order is enforced
+- `noDangerouslySetInnerHtml` disabled globally (the no-flash `<script>` is intentional)
+- CSS parser: `tailwindDirectives: true` (required for Tailwind v4 `@plugin`, `@custom-variant`, `@theme` syntax)
+- `next.config.ts` sets `eslint.ignoreDuringBuilds: true` (Biome handles linting, not Next.js build pipeline)
 
 ## React Query (TanStack Query v5)
 - `QueryClientProvider` lives in `shared/providers/index.tsx` (Client Component), wrapping the full app in `app/layout.tsx`
@@ -175,7 +225,7 @@ pnpm dlx shadcn@latest add <component>  # Add shadcn component
 The app is **not** multi-language yet, but is wired for a zero-friction next-intl migration.
 
 ### Current setup (no packages installed)
-- **`messages/en.json`** — single source of truth for all UI strings. Use nested namespaces named after the feature (e.g. `"Auth"`, `"Landing"`). Never hardcode display strings in components.
+- **`messages/en.json`** — single source of truth for all UI strings. Use nested namespaces named after the feature (e.g. `"Auth"`, `"Home"`, `"Landing"`). Never hardcode display strings in components.
 - **`shared/i18n/dictionary.ts`** — async helper that wraps `messages/en.json`. Its API intentionally mirrors `next-intl`'s `getTranslations()`:
   ```ts
   const t = await getDictionary("Auth");
@@ -217,3 +267,4 @@ Everything else stays the same — no component changes needed.
 - Keep `next.config.ts` minimal unless a specific feature requires it
 - Always run `pnpm lint` before considering a task done
 - Public static assets live under `public/assets/` (images, fonts, icons)
+- Mock auth uses a `mock-auth` cookie set by `shared/actions/auth-cookie.ts` — no real backend yet

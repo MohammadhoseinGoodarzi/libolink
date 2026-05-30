@@ -20,9 +20,10 @@ Libolink is a book-centric social network where readers discover new reads, shar
 | Styling | Tailwind CSS v4 + shadcn/ui (new-york) |
 | UI Primitives | Radix UI |
 | Icons | Lucide React |
-| Forms | React Hook Form + Zod v4 |
+| Forms | React Hook Form + Valibot |
 | Server State | React Server Components + `async/await` |
-| Client State | TanStack Query v5 |
+| Client State | Jotai v2 + TanStack Query v5 |
+| Linting / Formatting | Biome 2 |
 | i18n | Custom `getDictionary()` — zero-package, next-intl-compatible API |
 | Package Manager | pnpm |
 
@@ -43,22 +44,45 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Project Structure
 
 ```
-app/
-  (auth)/             # Auth route group — sign-in and sign-up pages (no Header)
-  (landing)/          # Landing route group — public pages (with Header)
-  layout.tsx          # Root layout — Providers only
-components/
-  auth/               # Auth forms and tab switcher ("use client")
-  landing/            # Landing page sections (Header, Hero)
-  ui/                 # shadcn/ui primitives customized to Libolink design system
-lib/                  # Business logic, Zod schemas, utilities, i18n helper
-types/                # All TypeScript interfaces — never declared inside components
+app/                    Next.js routing layer only — thin pages, no logic
+  (auth)/               Auth route group — sign-in, sign-up (no header)
+  (dashboard)/          Authenticated app shell and routes
+  (landing)/            Public pages with header
+  layout.tsx            Root layout — Providers, font, no-flash theme script
+  globals.css           Tailwind v4 @theme tokens + dark mode CSS variables
+
+features/               Vertical feature slices
+  auth/                 Sign-in, sign-up, Valibot schemas, mock auth service
+  home/                 Feed, sidebars, nav, post cards, AI panel, stories
+  landing/              Landing hero and public header
+
+shared/                 Cross-feature code — no feature knowledge
+  actions/              Server Actions (e.g. set-auth-cookie)
+  components/
+    ui/                 shadcn/ui primitives customised to Libolink design
+      button.tsx        Variants: default, outline, ghost, destructive, post
+      input.tsx         Variants: default, auth (pill)
+      form-field.tsx    Label + input + reserved error row
+      search-input.tsx  Pill search bar with Search + Mic icon decorators
+      password-input.tsx Input with built-in show/hide toggle
+    theme-toggle.tsx    Hydration-safe dark/light toggle
+  i18n/                 getDictionary() helper (mirrors next-intl API)
+  providers/            TanStack Query + Jotai provider tree
+  store/                Global Jotai atoms
+  types/                Shared TypeScript interfaces
+  utils/                cn() — clsx + tailwind-merge
+  validations/          valibotResolver re-export for react-hook-form
+
 messages/
-  en.json             # Single source of truth for all UI strings
-public/               # Static assets
+  en.json               Single source of truth for all UI strings
+
+public/assets/
+  fonts/                Vazirmatn variable font (woff2)
+  images/               logo.png, app preview images
+  icons/                Platform SVG icons (Apple, Android)
 ```
 
-> Path alias `@/` maps to the project root. Full structure: [`STRUCTURE.md`](STRUCTURE.md)
+> Full architecture details: [`ARCHITECTURE.md`](ARCHITECTURE.md)
 
 ## Design System
 
@@ -66,13 +90,22 @@ Brand tokens are defined in [`app/globals.css`](app/globals.css) under `@theme i
 
 | Token | Value | Usage |
 |---|---|---|
-| `brand-primary` | `#023618` | Main green — buttons, headings |
-| `brand-accent` | `#c14953` | Destructive / CTA accent |
-| `brand-navy` | `#1d3557` | Dark navy for contrast |
-| `brand-surface` | `#E8EBF4` | Subtle background fills |
-| `brand-gray` | `#6B7280` | Secondary text |
+| `brand-primary` | `#023618` | Main green — buttons, headings, nav |
+| `brand-accent` | `#c14953` | Destructive / form CTA accent |
+| `brand-navy` | `#1d3557` | Inline links, info badges |
+| `brand-surface` | `#E8EBF4` | Input fills, soft surfaces |
+| `brand-gray` | `#6B7280` | Secondary text, placeholders |
 | `brand-soft` | `#F8EAED` | Soft pink tint |
-| `brand-glow` | `#E9D5FF` | Purple glow for shadows |
+| `brand-glow` | `#E9D5FF` | Purple glow for post-button shadow |
+
+### Dark Mode
+
+Dark mode is fully implemented via CSS variable overrides in the `.dark` class:
+
+- Background `#051a0e`, card `#0c2218`, secondary `#162d1e`
+- Applied synchronously before React mounts via an inline `<script>` — reads `localStorage("theme")` and sets `.dark` on `<html>` to eliminate flash
+- `ThemeToggle` component handles toggling and persistence; uses `useSyncExternalStore` to avoid hydration mismatches
+- Present on every page: home dashboard, landing, sign-in, sign-up
 
 ### Button Variants
 
@@ -80,9 +113,20 @@ Brand tokens are defined in [`app/globals.css`](app/globals.css) under `@theme i
 |---|---|
 | `default` | Primary dark-green filled button |
 | `outline` | Surface-background with green text |
-| `ghost` | Transparent with green text |
-| `destructive` | Red accent, large — for bold CTAs |
-| `post` | Primary with purple glow shadow — for post actions |
+| `ghost` | Transparent with green text on hover surface |
+| `destructive` | Red accent, large — primary form CTA (sign-in, sign-up) |
+| `post` | Brand-primary with purple glow shadow — feed composer |
+
+| Size | Dimensions | Usage |
+|---|---|---|
+| `default` | h-42 | Standard CTAs |
+| `sm` | h-8 | Compact buttons |
+| `lg` | h-52 | Large emphasis |
+| `icon` | 36 × 36 | Icon-only buttons |
+| `icon-sm` | 32 × 32 | Small icon buttons (nav, toggles, close) |
+| `post` | h-19 | Inline composer submit |
+
+All `<Button>` elements default to `type="button"`. Pass `type="submit"` explicitly on form submit buttons.
 
 ## Commands
 
@@ -90,15 +134,18 @@ Brand tokens are defined in [`app/globals.css`](app/globals.css) under `@theme i
 pnpm dev        # Start development server
 pnpm build      # Production build
 pnpm start      # Start production server
-pnpm lint       # Run ESLint
+pnpm lint       # Run Biome checks
+pnpm format     # Run Biome format and write
 ```
 
 ## Key Conventions
 
-- **Server Components by default** — only add `"use client"` when strictly needed (state, browser APIs, event handlers)
-- **No hardcoded hex values** — always use or create a CSS token in `globals.css`
-- **Tailwind built-in scale** — prefer `max-w-120` over `max-w-[480px]`; arbitrary values only when no built-in equivalent exists
-- **shadcn/ui components** are installed via `pnpm dlx shadcn@latest add <component>` then edited directly — no duplicate overrides
-- **Data fetching** in Server Components via `async/await`; TanStack Query only for mutations, polling, and optimistic updates
-- **Types** are never declared inside component files — all interfaces live in `types/`
+- **Server Components by default** — only add `"use client"` when strictly needed (state, browser APIs, event listeners)
+- **Always use shared UI components** — never raw `<button>` or `<input>`; add a variant/size if the style is close, create a new component in `shared/components/ui/` if it's truly different
+- **No hardcoded hex values** — always reference a CSS token in `globals.css`
+- **Tailwind built-in scale** — prefer `max-w-120` over `max-w-[480px]`; bracket notation only when no equivalent exists
+- **All UI strings in `messages/en.json`** — served via `getDictionary(namespace)`, never hardcoded in components
+- **shadcn/ui components** installed via `pnpm dlx shadcn@latest add <component>`, then edited in-place
+- **Data fetching** in Server Components via `async/await`; TanStack Query only for mutations, polling, optimistic updates
+- **Types** live in `features/<name>/types/` or `shared/types/` — never declared inside component files
 - **Git workflow** — always branch from `dev`; never commit directly to `dev` or `main`

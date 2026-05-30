@@ -1,4 +1,4 @@
-import en from "@/messages/en.json";
+import en from '@/messages/en.json';
 
 type Messages = typeof en;
 type Namespace = keyof Messages;
@@ -8,6 +8,5 @@ type Namespace = keyof Messages;
 //   export { getTranslations as getDictionary } from "next-intl/server";
 export async function getDictionary<N extends Namespace>(namespace: N) {
   const section = en[namespace];
-  return <K extends keyof typeof section>(key: K): string =>
-    String(section[key]);
+  return <K extends keyof typeof section>(key: K): string => String(section[key]);
 }

@@ -1,21 +1,20 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
-import { valibotResolver } from "@/shared/validations/valibot-resolver";
-import { signUp } from "../services/auth-service";
-import { signUpSchema, type SignUpInput } from "../validations/auth-schemas";
-import type { SignUpFormProps } from "../types";
-import { Button } from "@/shared/components/ui/button";
-import { FormField } from "@/shared/components/ui/form-field";
-import { Input } from "@/shared/components/ui/input";
+import { Button } from '@/shared/components/ui/button';
+import { FormField } from '@/shared/components/ui/form-field';
+import { Input } from '@/shared/components/ui/input';
+import { PasswordInput } from '@/shared/components/ui/password-input';
+import { valibotResolver } from '@/shared/validations/valibot-resolver';
+
+import { signUp } from '../services/auth-service';
+import type { SignUpFormProps } from '../types';
+import { type SignUpInput, signUpSchema } from '../validations/auth-schemas';
 
 export function SignUpForm({ strings }: SignUpFormProps) {
   const [success, setSuccess] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -23,7 +22,7 @@ export function SignUpForm({ strings }: SignUpFormProps) {
     formState: { errors, isSubmitting },
   } = useForm<SignUpInput>({
     resolver: valibotResolver(signUpSchema),
-    defaultValues: { email: "", username: "", password: "", confirmPassword: "" },
+    defaultValues: { email: '', username: '', password: '', confirmPassword: '' },
   });
 
   async function onSubmit(data: SignUpInput) {
@@ -48,73 +47,54 @@ export function SignUpForm({ strings }: SignUpFormProps) {
           variant="auth"
           placeholder={strings.emailPlaceholder}
           autoComplete="email"
-          {...register("email")}
+          {...register('email')}
         />
       </FormField>
 
-      <FormField label={strings.usernameLabel} htmlFor="signup-username" error={errors.username?.message}>
+      <FormField
+        label={strings.usernameLabel}
+        htmlFor="signup-username"
+        error={errors.username?.message}
+      >
         <Input
           id="signup-username"
           type="text"
           variant="auth"
           placeholder={strings.usernamePlaceholder}
           autoComplete="username"
-          {...register("username")}
+          {...register('username')}
         />
       </FormField>
 
-      <FormField label={strings.passwordLabel} htmlFor="signup-password" error={errors.password?.message}>
-        <div className="relative">
-          <Input
-            id="signup-password"
-            type={showPassword ? "text" : "password"}
-            variant="auth"
-            placeholder={strings.passwordPlaceholder}
-            autoComplete="new-password"
-            className="pr-12"
-            {...register("password")}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((prev) => !prev)}
-            tabIndex={-1}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-brand-gray hover:text-brand-primary"
-          >
-            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
-        </div>
-      </FormField>
-
-      <FormField label={strings.confirmPasswordLabel} htmlFor="signup-confirm-password" error={errors.confirmPassword?.message}>
-        <div className="relative">
-          <Input
-            id="signup-confirm-password"
-            type={showConfirmPassword ? "text" : "password"}
-            variant="auth"
-            placeholder={strings.confirmPasswordPlaceholder}
-            autoComplete="new-password"
-            className="pr-12"
-            {...register("confirmPassword")}
-          />
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword((prev) => !prev)}
-            tabIndex={-1}
-            aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-            className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-brand-gray hover:text-brand-primary"
-          >
-            {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
-        </div>
-      </FormField>
-
-      <Button
-        type="submit"
-        variant="destructive"
-        className="w-full mt-2"
-        disabled={isSubmitting}
+      <FormField
+        label={strings.passwordLabel}
+        htmlFor="signup-password"
+        error={errors.password?.message}
       >
+        <PasswordInput
+          id="signup-password"
+          variant="auth"
+          placeholder={strings.passwordPlaceholder}
+          autoComplete="new-password"
+          {...register('password')}
+        />
+      </FormField>
+
+      <FormField
+        label={strings.confirmPasswordLabel}
+        htmlFor="signup-confirm-password"
+        error={errors.confirmPassword?.message}
+      >
+        <PasswordInput
+          id="signup-confirm-password"
+          variant="auth"
+          placeholder={strings.confirmPasswordPlaceholder}
+          autoComplete="new-password"
+          {...register('confirmPassword')}
+        />
+      </FormField>
+
+      <Button type="submit" variant="destructive" className="w-full mt-2" disabled={isSubmitting}>
         {strings.submitLabel}
       </Button>
     </form>

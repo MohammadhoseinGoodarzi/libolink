@@ -1,1 +1,1 @@
-export { valibotResolver } from "@hookform/resolvers/valibot";
+export { valibotResolver } from '@hookform/resolvers/valibot';
