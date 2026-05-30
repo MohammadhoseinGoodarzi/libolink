@@ -43,12 +43,17 @@ libolink/
 │   │   └── signup/
 │   │       └── page.tsx
 │   │
+│   ├── (dashboard)/                            # Authenticated shell
+│   │   ├── layout.tsx                          # Assembles DashboardShell with sidebars
+│   │   └── home/
+│   │       └── page.tsx
+│   │
 │   ├── (landing)/                              # Public pages — with Header
 │   │   ├── layout.tsx
-│   │   └── page.tsx
+│   │   └── page.tsx                            # Landing or feed depending on auth cookie
 │   │
-│   ├── layout.tsx                              # Root layout — <Providers> + font only
-│   ├── globals.css                             # Tailwind v4 tokens + global styles
+│   ├── layout.tsx                              # Root layout — <Providers> + font + no-flash script
+│   ├── globals.css                             # Tailwind v4 @theme tokens + dark mode variables
 │   ├── loading.tsx                             # Global loading UI (Next.js convention)
 │   ├── error.tsx                               # Global error boundary (Next.js convention)
 │   ├── not-found.tsx                           # 404 page
@@ -57,89 +62,87 @@ libolink/
 ├── features/                                   # Vertical feature slices
 │   │
 │   ├── auth/                                   # ── Auth module ─────────────────────────
-│   │   ├── components/                         # Presentational — no state, pure props
+│   │   ├── containers/                         # Smart — "use client", orchestrates state + forms
 │   │   │   ├── auth-tabs.tsx
 │   │   │   ├── sign-in-form.tsx
 │   │   │   └── sign-up-form.tsx
-│   │   ├── containers/                         # Smart — orchestrate state + data
-│   │   │   ├── sign-in-container.tsx
-│   │   │   └── sign-up-container.tsx
-│   │   ├── hooks/                              # Auth-scoped hooks
-│   │   │   └── use-auth.ts
-│   │   ├── services/                           # API calls for auth endpoints
+│   │   ├── services/                           # Mock auth service + Server Action bridge
 │   │   │   └── auth-service.ts
-│   │   ├── store/                              # Jotai atoms scoped to auth
-│   │   │   └── auth-atoms.ts
+│   │   ├── store/
+│   │   │   └── index.ts
 │   │   ├── validations/                        # Valibot schemas
 │   │   │   └── auth-schemas.ts
 │   │   ├── types/
 │   │   │   └── index.ts
+│   │   └── index.ts                            # Public barrel
+│   │
+│   ├── home/                                   # ── Home / Feed module ───────────────────
+│   │   ├── components/                         # Presentational — pure props in, JSX out
+│   │   │   ├── ads-panel.tsx
+│   │   │   ├── ai-assistant-panel.tsx
+│   │   │   ├── download-app-card.tsx
+│   │   │   ├── favorite-book-card.tsx
+│   │   │   ├── nav-menu.tsx
+│   │   │   ├── post-card.tsx
+│   │   │   ├── post-composer.tsx
+│   │   │   ├── sidebar-left.tsx
+│   │   │   ├── sidebar-right.tsx
+│   │   │   ├── social-media-nav.tsx
+│   │   │   ├── stories-panel.tsx
+│   │   │   └── user-profile-card.tsx
+│   │   ├── containers/                         # Smart — "use client"
+│   │   │   ├── dashboard-shell.tsx             # Three-column shell + mobile drawer
+│   │   │   └── home-feed.tsx                   # Feed tabs, post list, composer
 │   │   ├── constants/
-│   │   │   └── index.ts                        # e.g. AUTH_ROUTES, PASSWORD_MIN_LENGTH
-│   │   ├── hocs/                               # Auth-specific HOCs (e.g. with-guest-only)
-│   │   ├── loading/                            # Auth skeletons / loading states
-│   │   │   └── auth-skeleton.tsx
-│   │   ├── error/                              # Auth-specific error UI
-│   │   │   └── auth-error.tsx
+│   │   │   └── index.ts                        # Mock posts, stories, nav items
+│   │   ├── types/
+│   │   │   └── index.ts
 │   │   └── index.ts                            # Public barrel
 │   │
 │   └── landing/                                # ── Landing module ───────────────────────
 │       ├── components/
 │       │   ├── header.tsx
 │       │   └── hero.tsx
-│       ├── containers/
-│       ├── hooks/
-│       ├── services/
-│       ├── store/
-│       ├── validations/
 │       ├── types/
 │       ├── constants/
-│       ├── hocs/
-│       ├── loading/
-│       ├── error/
 │       └── index.ts
 │
 ├── shared/                                     # Cross-feature code — no feature knowledge
+│   ├── actions/                                # Next.js Server Actions
+│   │   └── auth-cookie.ts                      # setAuthCookie() / clearAuthCookie()
 │   ├── components/
+│   │   ├── theme-toggle.tsx                    # Hydration-safe dark/light toggle
 │   │   └── ui/                                 # shadcn primitives + Libolink design system
-│   │       ├── button.tsx
-│   │       ├── form-field.tsx
-│   │       └── input.tsx
+│   │       ├── button.tsx                      # Variants: default, outline, ghost, destructive, post
+│   │       ├── form-field.tsx                  # Label + input + reserved h-4 error row
+│   │       ├── input.tsx                       # Variants: default, auth (pill)
+│   │       ├── password-input.tsx              # Input with built-in show/hide toggle
+│   │       └── search-input.tsx                # Pill search bar with Search + Mic icons
 │   ├── hooks/                                  # Generic hooks used by 2+ features
-│   ├── hocs/                                   # Global HOCs (e.g. with-auth, with-error-boundary)
+│   ├── i18n/
+│   │   └── dictionary.ts                       # getDictionary(namespace) — mirrors next-intl API
 │   ├── providers/                              # All React context providers
-│   │   ├── query-provider.tsx                  # TanStack Query + jotai-tanstack-query setup
-│   │   ├── jotai-provider.tsx
-│   │   └── index.tsx                           # <Providers> — single wrapper imported by app/layout.tsx
-│   ├── services/                               # HTTP layer
-│   │   ├── http-client.ts                      # Axios instance (base URL, headers, timeout)
-│   │   └── interceptors.ts                     # Request (token inject) + response (401, errors)
-│   ├── store/                                  # Global Jotai atoms (user session, theme, etc.)
-│   ├── validations/                            # Shared Valibot helpers + RHF resolver
-│   │   └── valibot-resolver.ts                 # Custom RHF resolver bridging Valibot + react-hook-form
-│   ├── utils/                                  # Pure functions — no side effects
-│   │   └── cn.ts                               # cn() — clsx + tailwind-merge
+│   │   ├── index.tsx                           # <Providers> — single wrapper in app/layout.tsx
+│   │   └── query-client.ts                     # makeQueryClient() / getQueryClient()
+│   ├── services/                               # HTTP layer (Axios instance + interceptors)
+│   ├── store/                                  # Global Jotai atoms (user session, etc.)
 │   ├── types/                                  # Shared TypeScript interfaces
 │   │   └── ui.ts                               # FormFieldProps, etc.
-│   ├── constants/                              # Global constants
-│   │   ├── routes.ts                           # ROUTES object — all app paths
-│   │   └── api-endpoints.ts                    # API_ENDPOINTS object
-│   ├── i18n/                                   # Internationalisation
-│   │   ├── dictionary.ts                       # getDictionary() helper
-│   │   └── types.ts                            # Dictionary type definitions
-│   ├── loading/                                # Global loading components
-│   │   └── spinner.tsx
-│   └── error/                                  # Global error boundary component
-│       └── error-boundary.tsx
+│   ├── utils/
+│   │   └── cn.ts                               # cn() — clsx + tailwind-merge
+│   ├── validations/
+│   │   └── valibot-resolver.ts                 # RHF resolver bridging Valibot + react-hook-form
+│   └── constants/                              # Global constants (routes, API endpoints)
 │
 ├── public/
 │   └── assets/
 │       ├── fonts/
+│       │   └── Vazirmatn[wght].woff2
 │       ├── images/
-│       │   ├── logo.svg
-│       │   ├── app-preview.png
-│       │   └── app-preview-side.png
+│       │   └── logo.png
 │       └── icons/
+│           ├── apple.svg
+│           └── android.svg
 │
 ├── messages/
 │   └── en.json                                 # Single source of truth for all UI strings
@@ -149,7 +152,7 @@ libolink/
 ├── next.config.ts
 ├── tsconfig.json
 ├── postcss.config.mjs
-├── eslint.config.mjs
+├── biome.json
 ├── components.json
 ├── package.json
 └── pnpm-lock.yaml
@@ -159,7 +162,7 @@ libolink/
 
 ## Feature Module Contract
 
-Every feature follows the **same internal shape** as `shared/`. Not every slot needs a file, but the location is always predictable:
+Every feature follows the **same internal shape**. Not every slot needs a file, but the location is always predictable:
 
 ```
 features/<name>/
@@ -186,18 +189,20 @@ features/<name>/
 ```
 app/(auth)/login/page.tsx            Server Component (async)
   ↓ calls getDictionary("Auth")
-  ↓ imports SignInContainer from @/features/auth
+  ↓ imports SignInForm from @/features/auth (via barrel)
   ↓ passes strings as props
 
-features/auth/containers/sign-in-container.tsx   "use client"
+features/auth/containers/sign-in-form.tsx   "use client"
   ↓ receives string props from the page
-  ↓ manages form state via react-hook-form
-  ↓ calls useMutation / atomWithMutation for the API call
-  ↓ renders <SignInForm />
+  ↓ manages form state via react-hook-form + valibotResolver
+  ↓ calls signIn() service + setAuthCookie() Server Action
+  ↓ renders <FormField>, <Input>, <PasswordInput>, <Button>
 
-features/auth/components/sign-in-form.tsx        pure presentational
-  ↓ receives all data + handlers as props
-  ↓ renders HTML — no state, no hooks
+app/(dashboard)/layout.tsx           Server Component (async)
+  ↓ calls getDictionary("Home")
+  ↓ imports DashboardShell, SidebarLeft, SidebarRight, SocialMediaNav from @/features/home
+  ↓ imports SearchInput from @/shared/components/ui/search-input
+  ↓ passes ReactNode slots to DashboardShell
 ```
 
 The page owns **nothing** except routing. The container owns **client state and data access**. The component owns **only appearance**.
@@ -226,11 +231,11 @@ Client/UI state            →  Jotai atoms     (user session, modals, theme)
 Bridge                     →  atomWithQuery / atomWithMutation from jotai-tanstack-query
 ```
 
-- Global atoms (`userAtom`, `themeAtom`) live in `shared/store/`
-- Feature atoms (`authLoadingAtom`) live in `features/<name>/store/`
+- Global atoms (`userAtom`) live in `shared/store/`
+- Feature atoms live in `features/<name>/store/`
 - Queries and mutations are initiated inside **containers** or **hooks**, never in components
 
-### HTTP: Axios
+### HTTP: Axios (planned)
 
 ```
 shared/services/http-client.ts    creates the Axios instance (baseURL, timeout, headers)
@@ -250,46 +255,67 @@ features/<name>/validations/              Valibot schemas for this feature's for
 ### i18n
 
 ```
-messages/en.json                  source of truth, namespaced by feature
-shared/i18n/dictionary.ts         getDictionary(namespace) helper
-shared/i18n/types.ts              TypeScript types for the dictionary shape
+messages/en.json                  source of truth, namespaced by feature (PascalCase key)
+shared/i18n/dictionary.ts         getDictionary(namespace) helper — mirrors next-intl API
 ```
+
+Migration path when next-intl is added: replace the body of `dictionary.ts` with one line — `export { getTranslations as getDictionary } from 'next-intl/server'`. No component changes needed.
+
+### Dark Mode
+
+```
+app/layout.tsx          inline <script> reads localStorage("theme"), sets .dark on <html>
+                        before React hydrates — eliminates theme flash on first paint
+app/globals.css         .dark {} block overrides all CSS variables
+shared/components/
+  theme-toggle.tsx      useSyncExternalStore + MutationObserver watches document.classList
+                        getServerSnapshot = () => false ensures server/client hydration agreement
+```
+
+`suppressHydrationWarning` on `<html>` is intentional — it covers only the `class` attribute mismatch introduced by the no-flash script.
 
 ---
 
 ## Barrel Export — Public API
 
-The `index.ts` at the root of each feature is its **only public interface**. External code never reaches inside:
+The `index.ts` at the root of each feature is its **only public interface**:
 
 ```ts
-// features/auth/index.ts
-export { AuthTabs }         from "./components/auth-tabs";
-export { SignInContainer }  from "./containers/sign-in-container";
-export { SignUpContainer }  from "./containers/sign-up-container";
-export { useAuth }          from "./hooks/use-auth";
-export type { SignInFormProps, SignUpFormProps, AuthTabsProps } from "./types";
+// features/home/index.ts
+export { SidebarLeft }     from './components/sidebar-left';
+export { SidebarRight }    from './components/sidebar-right';
+export { SocialMediaNav }  from './components/social-media-nav';
+export { DashboardShell }  from './containers/dashboard-shell';
+export { HomeFeed }        from './containers/home-feed';
+export { MOCK_POSTS, MOCK_STORIES } from './constants';
+export type { HomeFeedLabels } from './types';
 ```
 
 ```ts
 // ✅ correct
-import { SignInContainer } from "@/features/auth";
+import { DashboardShell } from "@/features/home";
 
 // ❌ wrong — never reach inside a feature
-import { SignInContainer } from "@/features/auth/containers/sign-in-container";
+import { DashboardShell } from "@/features/home/containers/dashboard-shell";
 ```
+
+`SearchInput` and `PasswordInput` are in `shared/components/ui/` (used by multiple features) — import them from `@/shared/components/ui/search-input` and `@/shared/components/ui/password-input` directly.
 
 ---
 
 ## `messages/en.json` — Namespace Convention
 
-Top-level key = feature name (PascalCase). Nested keys = component or sub-section:
+Top-level key = feature name (PascalCase). Nested keys are camelCase:
 
 ```json
 {
   "Auth": {
-    "title": "...",
-    "signIn": "...",
-    "signUp": "..."
+    "emailLabel": "...",
+    "signIn": "..."
+  },
+  "Home": {
+    "searchPlaceholder": "...",
+    "tabRecent": "..."
   },
   "Landing": {
     "Header": { "signIn": "...", "signUp": "..." },
@@ -300,22 +326,18 @@ Top-level key = feature name (PascalCase). Nested keys = component or sub-sectio
 
 ---
 
-## `shared/` — Belongs Here vs. Does Not
+## `shared/components/ui/` — What Belongs Here
 
-| Belongs in `shared/` | Does NOT belong in `shared/` |
+| Belongs | Does NOT belong |
 |---|---|
-| `components/ui/` — shadcn primitives | Feature components or containers |
-| `utils/cn.ts` — `cn()` helper | Feature business logic |
-| `i18n/dictionary.ts` | Feature Valibot schemas |
-| `services/http-client.ts` — Axios instance | Feature API service functions |
-| `services/interceptors.ts` | Feature types |
+| Primitives used by 2+ features (`Button`, `Input`, `SearchInput`, `PasswordInput`, `FormField`) | Feature-specific components |
+| `ThemeToggle` — used on every page | Feature business logic |
+| `utils/cn.ts` — `cn()` helper | Feature Valibot schemas |
+| `i18n/dictionary.ts` | Feature API service functions |
 | `providers/` — all app providers | Feature contexts |
-| `store/` — global atoms (user, theme) | Feature-scoped atoms |
+| `store/` — global atoms | Feature-scoped atoms |
 | `validations/valibot-resolver.ts` | Feature validation schemas |
-| `hooks/` — generic hooks (useDebounce, etc.) | Feature-specific hooks |
-| `constants/routes.ts`, `api-endpoints.ts` | Feature constants |
-| `error/error-boundary.tsx` | Feature error UI |
-| `loading/spinner.tsx` | Feature skeleton components |
+| `actions/` — shared Server Actions | Feature-only Server Actions |
 
 Rule: if two separate features would copy the code, it belongs in `shared/`.
 
@@ -326,31 +348,16 @@ Rule: if two separate features would copy the code, it belongs in `shared/`.
 `@/` maps to the project root:
 
 ```ts
-import { cn }        from "@/shared/utils/cn";
-import { Button }    from "@/shared/components/ui/button";
-import { ROUTES }    from "@/shared/constants/routes";
-import { httpClient } from "@/shared/services/http-client";
-import { SignInContainer } from "@/features/auth";
+import { cn }             from "@/shared/utils/cn";
+import { Button }         from "@/shared/components/ui/button";
+import { Input }          from "@/shared/components/ui/input";
+import { PasswordInput }  from "@/shared/components/ui/password-input";
+import { SearchInput }    from "@/shared/components/ui/search-input";
+import { FormField }      from "@/shared/components/ui/form-field";
+import { ThemeToggle }    from "@/shared/components/theme-toggle";
+import { getDictionary }  from "@/shared/i18n/dictionary";
+import { getQueryClient } from "@/shared/providers/query-client";
+import { ROUTES }         from "@/shared/constants/routes";
+import { DashboardShell } from "@/features/home";
+import { SignInForm }     from "@/features/auth";
 ```
-
----
-
-## Migration Map — Current → Target
-
-| Current path | Target path |
-|---|---|
-| `components/auth/AuthTabs.tsx` | `features/auth/components/auth-tabs.tsx` |
-| `components/auth/SignInForm.tsx` | `features/auth/components/sign-in-form.tsx` |
-| `components/auth/SignUpForm.tsx` | `features/auth/components/sign-up-form.tsx` |
-| `components/landing/Header.tsx` | `features/landing/components/header.tsx` |
-| `components/landing/Hero.tsx` | `features/landing/components/hero.tsx` |
-| `components/ui/` | `shared/components/ui/` |
-| `components/providers.tsx` | `shared/providers/index.tsx` |
-| `lib/auth.ts` | `features/auth/services/auth-service.ts` + `features/auth/validations/auth-schemas.ts` |
-| `lib/zod-resolver.ts` | `shared/validations/valibot-resolver.ts` (Valibot replaces Zod) |
-| `lib/dictionary.ts` | `shared/i18n/dictionary.ts` |
-| `lib/query-client.ts` | `shared/providers/query-provider.tsx` |
-| `lib/utils.ts` | `shared/utils/cn.ts` |
-| `types/auth.ts` | `features/auth/types/index.ts` |
-| `types/ui.ts` | `shared/types/ui.ts` |
-| `public/*.png`, `public/logo.svg` | `public/assets/images/`, `public/assets/icons/` |
