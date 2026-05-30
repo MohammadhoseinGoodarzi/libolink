@@ -1,17 +1,19 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
-import { useForm } from "react-hook-form";
-import Link from "next/link";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
 
-import { valibotResolver } from "@/shared/validations/valibot-resolver";
-import { signIn } from "../services/auth-service";
-import { signInSchema, type SignInInput } from "../validations/auth-schemas";
-import type { SignInFormProps } from "../types";
-import { Button } from "@/shared/components/ui/button";
-import { FormField } from "@/shared/components/ui/form-field";
-import { Input } from "@/shared/components/ui/input";
+import { setAuthCookie } from '@/shared/actions/auth-cookie';
+import { Button } from '@/shared/components/ui/button';
+import { FormField } from '@/shared/components/ui/form-field';
+import { Input } from '@/shared/components/ui/input';
+import { PasswordInput } from '@/shared/components/ui/password-input';
+import { valibotResolver } from '@/shared/validations/valibot-resolver';
+
+import { signIn } from '../services/auth-service';
+import type { SignInFormProps } from '../types';
+import { type SignInInput, signInSchema } from '../validations/auth-schemas';
 
 function GoogleIcon() {
   return (
@@ -48,8 +50,7 @@ function FacebookIcon() {
 }
 
 export function SignInForm({ strings }: SignInFormProps) {
-  const [success, setSuccess] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -57,28 +58,17 @@ export function SignInForm({ strings }: SignInFormProps) {
     formState: { errors, isSubmitting },
   } = useForm<SignInInput>({
     resolver: valibotResolver(signInSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: '', password: '' },
   });
 
   async function onSubmit(data: SignInInput) {
     await signIn(data);
-    setSuccess(true);
-  }
-
-  if (success) {
-    return (
-      <p className="py-4 text-center text-sm font-medium text-brand-primary">
-        {strings.successMessage}
-      </p>
-    );
+    await setAuthCookie();
+    router.push('/');
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-      className="flex flex-col gap-4"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
       <FormField label={strings.emailLabel} htmlFor="signin-email" error={errors.email?.message}>
         <Input
           id="signin-email"
@@ -86,7 +76,7 @@ export function SignInForm({ strings }: SignInFormProps) {
           variant="auth"
           placeholder={strings.emailPlaceholder}
           autoComplete="email"
-          {...register("email")}
+          {...register('email')}
         />
       </FormField>
 
@@ -103,34 +93,16 @@ export function SignInForm({ strings }: SignInFormProps) {
           </Link>
         }
       >
-        <div className="relative">
-          <Input
-            id="signin-password"
-            type={showPassword ? "text" : "password"}
-            variant="auth"
-            placeholder={strings.passwordPlaceholder}
-            autoComplete="current-password"
-            className="pr-12"
-            {...register("password")}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((prev) => !prev)}
-            tabIndex={-1}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-brand-gray hover:text-brand-primary"
-          >
-            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
-        </div>
+        <PasswordInput
+          id="signin-password"
+          variant="auth"
+          placeholder={strings.passwordPlaceholder}
+          autoComplete="current-password"
+          {...register('password')}
+        />
       </FormField>
 
-      <Button
-        type="submit"
-        variant="destructive"
-        className="w-full mt-2"
-        disabled={isSubmitting}
-      >
+      <Button type="submit" variant="destructive" className="w-full mt-2" disabled={isSubmitting}>
         {strings.submitLabel}
       </Button>
 
@@ -155,9 +127,7 @@ export function SignInForm({ strings }: SignInFormProps) {
           className="h-13 w-full rounded-full text-sm font-normal"
         >
           <FacebookIcon />
-          <span className="flex-1 text-center">
-            {strings.signInWithFacebook}
-          </span>
+          <span className="flex-1 text-center">{strings.signInWithFacebook}</span>
         </Button>
       </div>
     </form>

@@ -1,9 +1,9 @@
-import type { FormFieldProps } from "@/shared/types/ui";
+import type { FormFieldProps } from '@/shared/types/ui';
 
 export function FormField({ label, htmlFor, error, action, children }: FormFieldProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={htmlFor} className="text-sm font-medium">
+      <label htmlFor={htmlFor} className="text-sm font-medium text-foreground">
         {label}
       </label>
       {children}

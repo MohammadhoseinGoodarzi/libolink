@@ -96,19 +96,19 @@
 }
 
 .dark {
-  --background: oklch(0.16 0.012 158);
+  --background: #051a0e;
   --foreground: oklch(0.96 0.005 158);
-  --card: oklch(0.22 0.012 158);
+  --card: #0c2218;
   --card-foreground: oklch(0.96 0.005 158);
-  --popover: oklch(0.22 0.012 158);
+  --popover: #0c2218;
   --popover-foreground: oklch(0.96 0.005 158);
-  --primary: oklch(0.55 0.07 158);
+  --primary: oklch(0.58 0.08 158);
   --primary-foreground: oklch(0.12 0 0);
-  --secondary: oklch(0.27 0.012 158);
+  --secondary: #162d1e;
   --secondary-foreground: oklch(0.96 0.005 158);
-  --muted: oklch(0.27 0.012 158);
+  --muted: #162d1e;
   --muted-foreground: oklch(0.7 0.013 264);
-  --accent: oklch(0.27 0.012 158);
+  --accent: #162d1e;
   --accent-foreground: oklch(0.96 0.005 158);
   --destructive: oklch(0.65 0.16 17);
   --destructive-foreground: oklch(0.985 0 0);
@@ -134,5 +134,27 @@
 @layer base {
   body {
     font-family: var(--font-sans);
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--foreground);
+    -webkit-box-shadow: 0 0 0 1000px var(--secondary) inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
   }
 }
