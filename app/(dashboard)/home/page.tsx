@@ -19,6 +19,7 @@ export default async function HomePage() {
     like: t('like'),
     comment: t('comment'),
     share: t('share'),
+    copied: t('copied'),
   };
 
   return <HomeFeed posts={MOCK_POSTS} stories={MOCK_STORIES} labels={feedLabels} />;

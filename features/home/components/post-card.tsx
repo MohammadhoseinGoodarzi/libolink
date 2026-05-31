@@ -2,18 +2,24 @@ import { Heart, MessageCircle, Share2 } from 'lucide-react';
 import Image from 'next/image';
 
 import { Button } from '@/shared/components/ui/button';
+import { cn } from '@/shared/utils/cn';
 
-import type { Post } from '../types';
+import type { PostCardProps } from '../types';
 
-interface PostCardProps {
-  post: Post;
-  likeLabel: string;
-  commentLabel: string;
-  shareLabel: string;
-}
-
-export function PostCard({ post, likeLabel, commentLabel, shareLabel }: PostCardProps) {
-  const { author, content, timestamp, bookCoverUrl } = post;
+export function PostCard({
+  post,
+  likeLabel,
+  commentLabel,
+  shareLabel,
+  copiedLabel,
+  liked,
+  likeCount,
+  shared,
+  onLike,
+  onComment,
+  onShare,
+}: PostCardProps) {
+  const { author, content, timestamp, bookCoverUrl, commentsCount } = post;
 
   const initials = author.name
     .split(' ')
@@ -45,12 +51,12 @@ export function PostCard({ post, likeLabel, commentLabel, shareLabel }: PostCard
           {content}
         </p>
         {bookCoverUrl && (
-          <div className="w-24 h-34 rounded-xl overflow-hidden shrink-0 bg-muted">
+          <div className="w-36 h-48 rounded-xl overflow-hidden shrink-0 bg-muted">
             <Image
               src={bookCoverUrl}
               alt=""
-              width={96}
-              height={136}
+              width={144}
+              height={192}
               className="w-full h-full object-cover"
             />
           </div>
@@ -60,27 +66,37 @@ export function PostCard({ post, likeLabel, commentLabel, shareLabel }: PostCard
       <div className="mt-4 pt-4 border-t border-border flex items-center gap-6">
         <Button
           variant="ghost"
-          disabled
-          className="h-auto px-0 gap-2 text-sm text-muted-foreground hover:bg-transparent"
+          onClick={onLike}
+          className={cn(
+            'h-auto px-0 gap-2 text-sm hover:bg-transparent transition-colors',
+            liked
+              ? 'text-red-500 hover:text-red-500'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
         >
-          <Heart size={16} />
-          {likeLabel}
+          <Heart size={16} fill={liked ? 'currentColor' : 'none'} />
+          {likeCount > 0 ? likeCount : likeLabel}
         </Button>
+
         <Button
           variant="ghost"
-          disabled
-          className="h-auto px-0 gap-2 text-sm text-muted-foreground hover:bg-transparent"
+          onClick={onComment}
+          className="h-auto px-0 gap-2 text-sm text-muted-foreground hover:text-foreground hover:bg-transparent"
         >
           <MessageCircle size={16} />
-          {commentLabel}
+          {commentsCount > 0 ? commentsCount : commentLabel}
         </Button>
+
         <Button
           variant="ghost"
-          disabled
-          className="h-auto px-0 gap-2 text-sm text-muted-foreground hover:bg-transparent"
+          onClick={onShare}
+          className={cn(
+            'h-auto px-0 gap-2 text-sm hover:bg-transparent transition-colors',
+            shared ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+          )}
         >
           <Share2 size={16} />
-          {shareLabel}
+          {shared ? copiedLabel : shareLabel}
         </Button>
       </div>
     </div>

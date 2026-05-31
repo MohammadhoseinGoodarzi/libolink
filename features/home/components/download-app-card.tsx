@@ -19,7 +19,7 @@ export function DownloadAppCard({ title, appStoreLabel, googlePlayLabel }: Downl
           className="rounded-full border border-white/30 text-primary-foreground bg-transparent hover:bg-white/10 text-xs h-auto py-1.5 px-4"
         >
           <Image src="/assets/icons/apple.svg" width={14} height={14} alt="" aria-hidden />
-          {appStoreLabel}
+          <span className="translate-y-px">{appStoreLabel}</span>
         </Button>
         <Button
           variant="ghost"
@@ -27,7 +27,7 @@ export function DownloadAppCard({ title, appStoreLabel, googlePlayLabel }: Downl
           className="rounded-full border border-white/30 text-primary-foreground bg-transparent hover:bg-white/10 text-xs h-auto py-1.5 px-4"
         >
           <Image src="/assets/icons/android.svg" width={14} height={14} alt="" aria-hidden />
-          {googlePlayLabel}
+          <span className="translate-y-px">{googlePlayLabel}</span>
         </Button>
       </div>
     </div>

@@ -35,8 +35,8 @@ export function NavMenu({ items }: NavMenuProps) {
               key={key}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-foreground opacity-40 cursor-not-allowed select-none"
             >
-              {Icon && <Icon size={18} className="shrink-0" />}
-              {label}
+              {Icon && <Icon size={18} className="shrink-0 -translate-y-px" />}
+              <span className="translate-y-px">{label}</span>
             </span>
           );
         }
@@ -52,8 +52,8 @@ export function NavMenu({ items }: NavMenuProps) {
                 : 'text-foreground hover:bg-secondary',
             )}
           >
-            {Icon && <Icon size={18} className="shrink-0" />}
-            {label}
+            {Icon && <Icon size={18} className="shrink-0 -translate-y-px" />}
+            <span className="translate-y-px">{label}</span>
           </Link>
         );
       })}

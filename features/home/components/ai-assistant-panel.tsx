@@ -1,6 +1,6 @@
 'use client';
 
-import { Bot, User } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import { useState } from 'react';
 
 import { Input } from '@/shared/components/ui/input';
@@ -15,31 +15,35 @@ export function AiAssistantPanel({ labels }: AiAssistantPanelProps) {
   const [input, setInput] = useState('');
 
   return (
-    <div className="flex-1 rounded-2xl p-4 bg-linear-to-br from-brand-soft to-brand-glow dark:from-[#0c2218] dark:to-[#1a1a2e]">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
-            <Bot size={15} className="text-primary-foreground" />
+    <div className="flex-1 flex flex-col rounded-2xl overflow-hidden min-h-0">
+      {/* Gradient body */}
+      <div className="flex-1 flex flex-col p-4 bg-linear-to-b from-white to-brand-glow dark:from-[#1a1030] dark:to-[#0d0820]">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+              <Bot size={15} className="text-primary-foreground" />
+            </div>
+            <span className="font-semibold text-sm text-foreground">{labels.title}</span>
           </div>
-          <span className="font-semibold text-sm text-foreground">{labels.title}</span>
+          <span className="bg-foreground text-background text-[10px] px-2.5 py-1 rounded-lg font-medium">
+            {labels.mode}
+          </span>
         </div>
-        <span className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded font-medium">
-          {labels.mode}
-        </span>
-      </div>
 
-      <div className="flex items-start gap-2 mb-3">
-        <User size={13} className="text-muted-foreground mt-0.5 shrink-0" />
-        <p className="text-xs text-foreground leading-relaxed">{labels.greeting}</p>
-      </div>
+        {/* Spacer pushes greeting to bottom */}
+        <div className="flex-1" />
 
-      <Input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder={labels.placeholder}
-        className="rounded-xl bg-background/70 dark:bg-card/80 border-border/50 dark:border-white/15 text-sm shadow-none"
-      />
+        <p className="text-xs text-foreground/70 leading-relaxed mb-3">{labels.greeting}</p>
+
+        <Input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={labels.placeholder}
+          className="rounded-xl bg-white/80 dark:bg-white/10 border-transparent shadow-none text-sm"
+        />
+      </div>
     </div>
   );
 }

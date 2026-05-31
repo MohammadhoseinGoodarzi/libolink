@@ -41,6 +41,7 @@ export default async function RootPage() {
     like: t('like'),
     comment: t('comment'),
     share: t('share'),
+    copied: t('copied'),
   };
 
   return (

@@ -16,6 +16,8 @@ export interface Post {
   content: string;
   timestamp: string;
   bookCoverUrl?: string;
+  likes: number;
+  commentsCount: number;
 }
 
 export interface Story {
@@ -40,6 +42,21 @@ export interface HomeFeedLabels {
   like: string;
   comment: string;
   share: string;
+  copied: string;
+}
+
+export interface PostCardProps {
+  post: Post;
+  likeLabel: string;
+  commentLabel: string;
+  shareLabel: string;
+  copiedLabel: string;
+  liked: boolean;
+  likeCount: number;
+  shared: boolean;
+  onLike: () => void;
+  onComment: () => void;
+  onShare: () => void;
 }
 
 export interface AiPanelLabels {
