@@ -1,9 +1,12 @@
+import { cn } from '@/shared/utils/cn';
+
 interface UserProfileCardProps {
   name: string;
   role: string;
+  className?: string;
 }
 
-export function UserProfileCard({ name, role }: UserProfileCardProps) {
+export function UserProfileCard({ name, role, className }: UserProfileCardProps) {
   const initials = name
     .split(' ')
     .map((w) => w[0])
@@ -12,7 +15,7 @@ export function UserProfileCard({ name, role }: UserProfileCardProps) {
     .toUpperCase();
 
   return (
-    <div className="bg-primary rounded-2xl p-4 flex flex-col items-center gap-3">
+    <div className={cn('bg-primary rounded-2xl p-4 flex flex-col items-center gap-3', className)}>
       <div className="w-16 h-16 rounded-full bg-primary-foreground/20 ring-2 ring-white/40 flex items-center justify-center text-primary-foreground font-bold text-lg select-none">
         {initials}
       </div>

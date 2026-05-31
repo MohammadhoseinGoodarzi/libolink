@@ -23,7 +23,7 @@ export async function SidebarLeft() {
   ];
 
   return (
-    <div className="flex flex-col gap-4 p-4 pt-5">
+    <div className="h-full flex flex-col gap-4 p-4 pt-5">
       <div className="hidden lg:flex items-center justify-between px-1">
         <Link href="/" className="shrink-0">
           <Image
@@ -38,9 +38,14 @@ export async function SidebarLeft() {
         <ThemeToggle />
       </div>
 
-      <UserProfileCard name={MOCK_USER.name} role={MOCK_USER.role} />
-
-      <FavoriteBookCard label={t('favoriteBookLabel')} title={MOCK_USER.favoriteBook} />
+      <div className="rounded-2xl overflow-hidden flex flex-col">
+        <UserProfileCard name={MOCK_USER.name} role={MOCK_USER.role} className="rounded-none" />
+        <FavoriteBookCard
+          label={t('favoriteBookLabel')}
+          title={MOCK_USER.favoriteBook}
+          className="rounded-none border-t-0"
+        />
+      </div>
 
       <NavMenu items={navItems} />
 

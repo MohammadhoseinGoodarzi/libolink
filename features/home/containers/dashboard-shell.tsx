@@ -80,7 +80,7 @@ export function DashboardShell({
         {sidebarLeft}
       </aside>
 
-      <main className="flex-1 min-w-0 h-screen sticky top-0 overflow-hidden flex flex-col pb-5 px-4 lg:px-5">
+      <main className="flex-1 min-w-0 h-screen sticky top-0 overflow-hidden flex flex-col pb-4 px-4 lg:px-5">
         {/* Mobile top bar: hamburger | SocialMediaNav | AI button */}
         <div className="lg:hidden flex items-center gap-2 px-2 -mx-4 mb-1">
           <Button
