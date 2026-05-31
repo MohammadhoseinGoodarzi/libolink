@@ -43,6 +43,10 @@ export interface HomeFeedLabels {
   comment: string;
   share: string;
   copied: string;
+  commentModalTitle: string;
+  commentModalNoComments: string;
+  commentModalPlaceholder: string;
+  commentModalSend: string;
 }
 
 export interface PostCardProps {
@@ -57,6 +61,7 @@ export interface PostCardProps {
   onLike: () => void;
   onComment: () => void;
   onShare: () => void;
+  onImageClick?: (url: string) => void;
 }
 
 export interface AiPanelLabels {
@@ -64,4 +69,18 @@ export interface AiPanelLabels {
   mode: string;
   greeting: string;
   placeholder: string;
+}
+
+export interface Comment {
+  id: string;
+  author: PostAuthor;
+  content: string;
+  timestamp: string;
+}
+
+export interface CommentModalLabels {
+  title: string;
+  noComments: string;
+  placeholder: string;
+  send: string;
 }

@@ -15,6 +15,7 @@ interface PostComposerProps {
   locationLabel: string;
   tagLabel: string;
   postLabel: string;
+  onPost?: (content: string, imageFile?: File) => void;
 }
 
 export function PostComposer({
@@ -23,10 +24,15 @@ export function PostComposer({
   locationLabel,
   tagLabel,
   postLabel,
+  onPost,
 }: PostComposerProps) {
   const [text, setText] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isExpanded = isFocused || text.length > 0 || imagePreview !== null;
 
   useEffect(() => {
     return () => {
@@ -39,15 +45,18 @@ export function PostComposer({
     if (!file) return;
     if (imagePreview) URL.revokeObjectURL(imagePreview);
     setImagePreview(URL.createObjectURL(file));
+    setImageFile(file);
   };
 
   const removeImage = () => {
     setImagePreview(null);
+    setImageFile(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleSubmit = () => {
-    // TODO: call post service with { text, imageFile }
+    if (isEmpty) return;
+    onPost?.(text, imageFile ?? undefined);
     setText('');
     removeImage();
   };
@@ -71,14 +80,26 @@ export function PostComposer({
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             placeholder={placeholder}
             maxLength={MAX_CHARS}
-            rows={2}
-            className="flex-1 resize-none text-sm text-foreground placeholder:text-muted-foreground bg-transparent outline-none leading-relaxed"
+            className={cn(
+              'flex-1 resize-none text-sm text-foreground placeholder:text-muted-foreground bg-transparent outline-none leading-relaxed transition-[min-height] duration-300 ease-in-out',
+              isExpanded ? 'min-h-40' : 'min-h-12',
+            )}
           />
           {imagePreview && (
-            <div className="relative w-36 h-48 rounded-xl overflow-hidden shrink-0 bg-muted">
-              <Image src={imagePreview} alt="" fill unoptimized className="object-cover" />
+            <div className="relative shrink-0 rounded-xl overflow-hidden bg-muted">
+              <Image
+                src={imagePreview}
+                alt=""
+                width={0}
+                height={0}
+                unoptimized
+                sizes="144px"
+                className="w-36 h-auto block"
+              />
               <Button
                 variant="ghost"
                 size="icon-sm"
@@ -134,7 +155,13 @@ export function PostComposer({
               {charCount.toLocaleString()} / {MAX_CHARS.toLocaleString()}
             </span>
           )}
-          <Button variant="post" size="post" disabled={isEmpty} onClick={handleSubmit}>
+          <Button
+            type="submit"
+            variant="post"
+            size="post"
+            disabled={isEmpty}
+            onClick={handleSubmit}
+          >
             {postLabel}
           </Button>
         </div>

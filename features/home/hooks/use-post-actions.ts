@@ -11,6 +11,8 @@ interface PostState {
   shared: boolean;
 }
 
+const DEFAULT_STATE: PostState = { liked: false, likeCount: 0, shared: false };
+
 export function usePostActions(posts: Post[]) {
   const [states, setStates] = useState<Record<string, PostState>>(() =>
     Object.fromEntries(
@@ -27,18 +29,29 @@ export function usePostActions(posts: Post[]) {
     };
   }, []);
 
+  const registerPost = useCallback((postId: string, initialLikes: number) => {
+    setStates((prev) => {
+      if (prev[postId]) return prev;
+      return { ...prev, [postId]: { liked: false, likeCount: initialLikes, shared: false } };
+    });
+  }, []);
+
   const toggleLike = useCallback(
     (postId: string) => {
-      const nextLiked = !states[postId].liked;
+      const current = states[postId] ?? DEFAULT_STATE;
+      const nextLiked = !current.liked;
       void (nextLiked ? likePost(postId) : unlikePost(postId));
-      setStates((prev) => ({
-        ...prev,
-        [postId]: {
-          ...prev[postId],
-          liked: nextLiked,
-          likeCount: prev[postId].likeCount + (nextLiked ? 1 : -1),
-        },
-      }));
+      setStates((prev) => {
+        const entry = prev[postId] ?? DEFAULT_STATE;
+        return {
+          ...prev,
+          [postId]: {
+            ...entry,
+            liked: nextLiked,
+            likeCount: entry.likeCount + (nextLiked ? 1 : -1),
+          },
+        };
+      });
     },
     [states],
   );
@@ -46,11 +59,17 @@ export function usePostActions(posts: Post[]) {
   const triggerShare = useCallback((postId: string) => {
     void sharePost(postId);
     clearTimeout(shareTimers.current[postId]);
-    setStates((prev) => ({ ...prev, [postId]: { ...prev[postId], shared: true } }));
+    setStates((prev) => ({
+      ...prev,
+      [postId]: { ...(prev[postId] ?? DEFAULT_STATE), shared: true },
+    }));
     shareTimers.current[postId] = setTimeout(() => {
-      setStates((prev) => ({ ...prev, [postId]: { ...prev[postId], shared: false } }));
+      setStates((prev) => ({
+        ...prev,
+        [postId]: { ...(prev[postId] ?? DEFAULT_STATE), shared: false },
+      }));
     }, 2000);
   }, []);
 
-  return { states, toggleLike, triggerShare };
+  return { states, toggleLike, triggerShare, registerPost };
 }

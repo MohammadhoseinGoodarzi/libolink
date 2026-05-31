@@ -20,6 +20,10 @@ export default async function HomePage() {
     comment: t('comment'),
     share: t('share'),
     copied: t('copied'),
+    commentModalTitle: t('commentModalTitle'),
+    commentModalNoComments: t('commentModalNoComments'),
+    commentModalPlaceholder: t('commentModalPlaceholder'),
+    commentModalSend: t('commentModalSend'),
   };
 
   return <HomeFeed posts={MOCK_POSTS} stories={MOCK_STORIES} labels={feedLabels} />;
