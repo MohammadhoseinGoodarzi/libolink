@@ -42,6 +42,10 @@ export default async function RootPage() {
     comment: t('comment'),
     share: t('share'),
     copied: t('copied'),
+    commentModalTitle: t('commentModalTitle'),
+    commentModalNoComments: t('commentModalNoComments'),
+    commentModalPlaceholder: t('commentModalPlaceholder'),
+    commentModalSend: t('commentModalSend'),
   };
 
   return (

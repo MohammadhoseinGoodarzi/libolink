@@ -1,10 +1,15 @@
+'use client';
+
 import { Heart, MessageCircle, Share2 } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
 
 import { Button } from '@/shared/components/ui/button';
 import { cn } from '@/shared/utils/cn';
 
 import type { PostCardProps } from '../types';
+
+const TRUNCATE_AT = 500;
 
 export function PostCard({
   post,
@@ -18,8 +23,16 @@ export function PostCard({
   onLike,
   onComment,
   onShare,
+  onImageClick,
 }: PostCardProps) {
+  const [expanded, setExpanded] = useState(false);
   const { author, content, timestamp, bookCoverUrl, commentsCount } = post;
+
+  const isLong = content.length > TRUNCATE_AT;
+  const displayContent =
+    isLong && !expanded
+      ? content.slice(0, content.lastIndexOf(' ', TRUNCATE_AT) || TRUNCATE_AT)
+      : content;
 
   const initials = author.name
     .split(' ')
@@ -46,20 +59,35 @@ export function PostCard({
         </div>
       </div>
 
-      <div className="flex gap-4">
-        <p className="flex-1 text-sm leading-relaxed text-foreground whitespace-pre-line">
-          {content}
-        </p>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1 text-sm leading-relaxed text-foreground whitespace-pre-line">
+          {displayContent}
+          {isLong && (
+            <Button
+              variant="ghost"
+              onClick={() => setExpanded((v) => !v)}
+              className="inline ml-1 px-0 py-0 h-auto text-sm text-primary hover:bg-transparent hover:text-primary/80 font-medium"
+            >
+              {expanded ? 'show less' : 'show more...'}
+            </Button>
+          )}
+        </div>
         {bookCoverUrl && (
-          <div className="w-36 h-48 rounded-xl overflow-hidden shrink-0 bg-muted">
+          <button
+            type="button"
+            className="w-full sm:w-28 sm:shrink-0 rounded-xl overflow-hidden cursor-zoom-in p-0 bg-transparent border-0 block"
+            onClick={() => onImageClick?.(bookCoverUrl)}
+          >
             <Image
               src={bookCoverUrl}
               alt=""
-              width={144}
-              height={192}
-              className="w-full h-full object-cover"
+              width={0}
+              height={0}
+              unoptimized={bookCoverUrl.startsWith('blob:')}
+              sizes="112px"
+              className="w-full h-auto block"
             />
-          </div>
+          </button>
         )}
       </div>
 
