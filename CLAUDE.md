@@ -152,6 +152,7 @@ Only add `"use client"` when the component needs:
   - If the style is close to an existing variant, add a `className` override.
   - If it's a new reusable pattern, add a variant or size to `button.tsx`.
   - If it's truly different and reusable, create a new component in `shared/components/ui/`.
+  - **Exception:** invisible/wrapper `<button>` elements used purely for accessibility (e.g. a full-screen backdrop click-to-close, an image container that must have zero visual styling) may be raw `<button>` elements to avoid fighting `<Button>` defaults. These must have `type="button"`, an `aria-label`, and no visual styling.
 - **Never use raw `<input>` elements** outside of primitive UI components. Use `<Input>`, `<PasswordInput>`, or `<SearchInput>`.
 - **`<Button>` defaults to `type="button"`** — always pass `type="submit"` explicitly on form submit buttons.
 
@@ -260,6 +261,25 @@ Everything else stays the same — no component changes needed.
 - Commit messages follow conventional commits: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
 - **Never include `Co-Authored-By:` in commit messages.**
 
+## Overlay / Portal Pattern
+- **Never use Radix `Dialog` for full-screen overlays that need a true glass/blur backdrop.** Radix always renders its own `bg-black/80` overlay underneath, which means `backdrop-blur` on the content only blurs black — not the page.
+- Use `createPortal(…, document.body)` instead. Put `backdrop-blur-xl bg-white/10` directly on the outermost `<div>` to get the glassmorphism effect.
+- See `features/home/components/image-lightbox.tsx` for the canonical implementation.
+
+## next/image Patterns
+- **Natural aspect ratio:** `width={0} height={0} sizes="…" className="w-full h-auto block"` — lets CSS control layout while Next.js serves the correct intrinsic size.
+- **Blob URLs:** `unoptimized={src.startsWith('blob:')}` — Next.js cannot optimize `blob:` URLs. Use this conditional prop so the same component handles both static paths and user-uploaded previews.
+
+## Scroll-Hide Animation — Anti-Oscillation
+When hiding/showing a sticky element based on scroll direction, a layout change (e.g. the element collapsing) triggers a synthetic scroll event that immediately re-shows it, causing oscillation. Guard against this with two refs:
+- `visibleRef` — mirrors the state value so the scroll handler always sees the current value without needing it in deps.
+- `lastToggle` ref — stores `Date.now()` on every state change; the handler skips any event within 350 ms of the last toggle.
+See `features/home/containers/home-feed.tsx` for the canonical implementation.
+
+## Mock Assets
+- Mock book cover images live at `public/assets/images/mock/` (book-portrait.jpg, book-square.jpg, book-landscape.jpg, book-tall.jpg).
+- On Windows, download images with `curl --ssl-no-revoke` to bypass the CRL revocation check that fails when offline or on restricted networks.
+
 ## Key Reminders
 - This is a monorepo-free single Next.js app
 - `shared/components/ui/` files are intentionally edited — changes there are part of the design system
@@ -268,3 +288,4 @@ Everything else stays the same — no component changes needed.
 - Always run `pnpm lint` before considering a task done
 - Public static assets live under `public/assets/` (images, fonts, icons)
 - Mock auth uses a `mock-auth` cookie set by `shared/actions/auth-cookie.ts` — no real backend yet
+- All post/comment service functions are stubs — they map 1:1 to future API endpoints. Swap the function body only; callers stay the same.

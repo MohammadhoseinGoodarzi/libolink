@@ -80,11 +80,13 @@ libolink/
 │   │   ├── components/                         # Presentational — pure props in, JSX out
 │   │   │   ├── ads-panel.tsx
 │   │   │   ├── ai-assistant-panel.tsx
+│   │   │   ├── comment-modal.tsx               # Post comment thread modal (Radix Dialog)
 │   │   │   ├── download-app-card.tsx
 │   │   │   ├── favorite-book-card.tsx
+│   │   │   ├── image-lightbox.tsx              # Full-screen image viewer (createPortal, glass bg)
 │   │   │   ├── nav-menu.tsx
-│   │   │   ├── post-card.tsx
-│   │   │   ├── post-composer.tsx
+│   │   │   ├── post-card.tsx                   # Show-more/less (500 char), image click → lightbox
+│   │   │   ├── post-composer.tsx               # Expands on focus; onPost callback; 5 000 char limit
 │   │   │   ├── sidebar-left.tsx
 │   │   │   ├── sidebar-right.tsx
 │   │   │   ├── social-media-nav.tsx
@@ -92,9 +94,15 @@ libolink/
 │   │   │   └── user-profile-card.tsx
 │   │   ├── containers/                         # Smart — "use client"
 │   │   │   ├── dashboard-shell.tsx             # Three-column shell + mobile drawer
-│   │   │   └── home-feed.tsx                   # Feed tabs, post list, composer
+│   │   │   └── home-feed.tsx                   # Feed tabs, post list, scroll-hide composer, lightbox, comments
+│   │   ├── hooks/
+│   │   │   ├── use-comments.ts                 # Comment modal state — open/close/submit (optimistic)
+│   │   │   └── use-post-actions.ts             # Like / share state per post + registerPost for new posts
+│   │   ├── services/
+│   │   │   ├── comment-service.ts              # getComments / addComment stubs → future API
+│   │   │   └── post-service.ts                 # createPost / likePost / unlikePost / sharePost stubs
 │   │   ├── constants/
-│   │   │   └── index.ts                        # Mock posts, stories, nav items
+│   │   │   └── index.ts                        # MOCK_USER, MOCK_POSTS, MOCK_STORIES, nav items
 │   │   ├── types/
 │   │   │   └── index.ts
 │   │   └── index.ts                            # Public barrel
@@ -114,6 +122,7 @@ libolink/
 │   │   ├── theme-toggle.tsx                    # Hydration-safe dark/light toggle
 │   │   └── ui/                                 # shadcn primitives + Libolink design system
 │   │       ├── button.tsx                      # Variants: default, outline, ghost, destructive, post
+│   │       ├── dialog.tsx                      # Radix Dialog — used for comment modal
 │   │       ├── form-field.tsx                  # Label + input + reserved h-4 error row
 │   │       ├── input.tsx                       # Variants: default, auth (pill)
 │   │       ├── password-input.tsx              # Input with built-in show/hide toggle
@@ -139,7 +148,12 @@ libolink/
 │       ├── fonts/
 │       │   └── Vazirmatn[wght].woff2
 │       ├── images/
-│       │   └── logo.png
+│       │   ├── logo.png
+│       │   └── mock/                           # HD mock book covers for dev/demo
+│       │       ├── book-portrait.jpg           # 800×1200
+│       │       ├── book-square.jpg             # 900×900
+│       │       ├── book-landscape.jpg          # 1920×1080
+│       │       └── book-tall.jpg               # 720×1440
 │       └── icons/
 │           ├── apple.svg
 │           └── android.svg
@@ -282,13 +296,13 @@ The `index.ts` at the root of each feature is its **only public interface**:
 
 ```ts
 // features/home/index.ts
-export { SidebarLeft }     from './components/sidebar-left';
-export { SidebarRight }    from './components/sidebar-right';
-export { SocialMediaNav }  from './components/social-media-nav';
-export { DashboardShell }  from './containers/dashboard-shell';
-export { HomeFeed }        from './containers/home-feed';
+export { SidebarLeft }              from './components/sidebar-left';
+export { SidebarRight }             from './components/sidebar-right';
+export { SocialMediaNav }           from './components/social-media-nav';
+export { DashboardShell }           from './containers/dashboard-shell';
+export { HomeFeed }                 from './containers/home-feed';
 export { MOCK_POSTS, MOCK_STORIES } from './constants';
-export type { HomeFeedLabels } from './types';
+export type { HomeFeedLabels }      from './types';
 ```
 
 ```ts
